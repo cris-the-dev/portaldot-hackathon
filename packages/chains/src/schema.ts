@@ -28,6 +28,8 @@ export const evmNetworkSchema = z.object({
   wsUrl: orTodo(url).nullable().optional(),
   nativeName: z.string().min(1).optional(),
   explorer: orTodo(url).nullable(),
+  /** Official faucet, if any. */
+  faucetUrl: orTodo(url).nullable().optional(),
   testnet: z.boolean().optional(),
 });
 

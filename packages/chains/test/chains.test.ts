@@ -46,7 +46,7 @@ describe("bundled config/networks.json", () => {
     const status = listNetworks(noEnv).find((n) => n.key === "portaldot-v3");
     expect(status?.status).toBe("pending");
     expect(status?.pending).toEqual(
-      expect.arrayContaining(["chainId", "rpcUrl", "nativeDecimals", "explorer", "ss58Prefix"]),
+      expect.arrayContaining(["chainId", "rpcUrl", "nativeDecimals", "explorer", "faucetUrl", "ss58Prefix"]),
     );
   });
 

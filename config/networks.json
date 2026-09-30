@@ -21,6 +21,7 @@
     "nativeSymbol": "POT",
     "nativeDecimals": "TODO",
     "explorer": "TODO",
+    "faucetUrl": "TODO",
     "ss58Prefix": "TODO",
     "testnet": true,
     "notes": "V3 (EVM) not public as of 2026-09-30. Fill every TODO from the V3 repo/docs — see docs/v3-findings.md."
