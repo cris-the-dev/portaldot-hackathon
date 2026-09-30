@@ -41,7 +41,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
-          submodules: recursive
+          submodules: true # OZ's own nested test submodules aren't needed
 
       - uses: foundry-rs/foundry-toolchain@v1
         with:
