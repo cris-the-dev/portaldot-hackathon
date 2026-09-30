@@ -1,0 +1,29 @@
+{
+  "name": "@portalkit/address",
+  "version": "0.0.0",
+  "description": "SS58 helpers and pluggable EVM (H160) <-> Substrate (SS58) mapping strategies for Portaldot",
+  "license": "MIT",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "lint": "eslint src test",
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@polkadot/util": "^14.0.3",
+    "@polkadot/util-crypto": "^14.0.3",
+    "@portalkit/chains": "workspace:*",
+    "viem": "^2.57.0"
+  }
+}
