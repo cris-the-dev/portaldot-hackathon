@@ -1,0 +1,30 @@
+[profile.default]
+src = "src"
+test = "test"
+script = "script"
+out = "out"
+libs = ["lib"]
+solc_version = "0.8.28"
+evm_version = "cancun"
+optimizer = true
+optimizer_runs = 200
+remappings = [
+    "@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/",
+    "forge-std/=lib/forge-std/src/",
+]
+fs_permissions = [{ access = "read", path = "../config" }]
+
+[fuzz]
+runs = 512
+
+[profile.ci.fuzz]
+runs = 4096
+
+[fmt]
+line_length = 120
+
+# RPC endpoints mirror config/networks.json (single source of truth).
+# The Portaldot V3 endpoint is supplied via env until V3 details are public (see docs/v3-findings.md).
+[rpc_endpoints]
+anvil = "http://127.0.0.1:8545"
+portaldot_v3 = "${PORTALDOT_V3_RPC_URL}"
