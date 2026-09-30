@@ -24,14 +24,16 @@ Exit code is `1` if any check fails. RPC URLs can be overridden with `PORTALKIT_
 ## `create-portalkit-app`
 
 ```bash
-create-portalkit-app my-app          # prompts for a name when omitted
+create-portalkit-app my-app                       # prompts for name / toolchain when omitted
+create-portalkit-app my-app --contracts hardhat   # Hardhat 3 + viem instead of Foundry
 ```
 
 Generates a pnpm project:
 
 ```
 my-app/
-  contracts/      Foundry: Counter, tests, deploy script (forge-std installed)
+  contracts/      Foundry (Counter, forge tests, forge script)  — or —
+                  Hardhat 3 (Counter, node:test + viem tests, viem deploy script; networks from networks.json)
   web/            Next.js + wagmi + viem; chains from ../networks.json via @portalkit/chains
   networks.json   snapshot of PortalKit's network config (the project's own source of truth)
   deployments/    <chainId>.json written by the deploy script, read by the web app
@@ -40,7 +42,9 @@ my-app/
 Scripts: `pnpm contracts:test`, `pnpm deploy:anvil`, `pnpm dev`, `pnpm check` (= `portalkit doctor`;
 not named `doctor` because `pnpm doctor` is a pnpm built-in).
 
-Options: `--no-git` (skip `git init` + `forge install`), `--no-install` (skip `pnpm install`),
+Both presets deploy with one command (`pnpm deploy:anvil`) and write the same `deployments/<chainId>.json`.
+
+Options: `--contracts foundry|hardhat`, `--no-git` (skip `git init` + `forge install`), `--no-install` (skip `pnpm install`),
 `--portalkit <path>` (development: `pnpm pack` the local PortalKit packages into `.portalkit/` and
 point dependencies/overrides at them — works before anything is published to npm).
 

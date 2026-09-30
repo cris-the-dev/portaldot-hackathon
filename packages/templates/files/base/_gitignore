@@ -11,3 +11,6 @@ contracts/broadcast/*/31337/
 
 # local-mode PortalKit tarballs (create-portalkit-app --portalkit)
 .portalkit/
+contracts/artifacts/
+contracts/types/
+contracts/ignition/deployments/chain-31337/

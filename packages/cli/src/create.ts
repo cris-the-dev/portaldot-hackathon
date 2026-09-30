@@ -2,21 +2,30 @@ import { spawnSync } from "node:child_process";
 import { cp, mkdir, readFile, readdir, rename, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { defaultNetworks } from "@portalkit/chains";
-import { FORGE_STD_TAG, RENAMES, TEMPLATE_SETS, templateDir, type TemplateVars } from "@portalkit/templates";
+import {
+  FORGE_STD_TAG,
+  RENAMES,
+  templateDir,
+  templateLayout,
+  type ContractsToolchain,
+  type TemplateVars,
+} from "@portalkit/templates";
 
 export interface CreateOptions {
   /** Target directory (created; must be empty or missing). */
   dir: string;
   /** npm package name; defaults to the directory name. */
   projectName?: string;
+  /** Contracts toolchain (default: foundry). */
+  contracts?: ContractsToolchain;
   /**
-   * Path to a local PortalKit monorepo. When set, @portalkit/* deps are `link:`ed to it instead of
+   * Path to a local PortalKit monorepo. When set, @portalkit/* packages are packed from it instead of
    * taken from npm — for developing PortalKit itself before the packages are published.
    */
   portalkitSource?: string;
   /** Version range for @portalkit/* packages from npm. */
   portalkitVersion?: string;
-  /** Run `git init` + `forge install forge-std` (needs git + Foundry). */
+  /** Run `git init` (+ `forge install forge-std` for Foundry; needs git + Foundry). */
   git?: boolean;
   /** Run `pnpm install` (needs pnpm). */
   install?: boolean;
@@ -53,6 +62,8 @@ export async function createProject(options: CreateOptions): Promise<CreateResul
   if (nameError) throw new CreateError(`Invalid project name "${projectName}": ${nameError}`);
   await assertEmptyDir(dir);
 
+  const contracts = options.contracts ?? "foundry";
+  const contractsDescription = contracts === "foundry" ? "Foundry" : "Hardhat 3 (viem)";
   const steps: CreateResult["steps"] = [];
   let vars: TemplateVars;
   let tarballs: Record<string, string> | undefined;
@@ -62,20 +73,21 @@ export async function createProject(options: CreateOptions): Promise<CreateResul
     tarballs = await packLocalPackages(options.portalkitSource, dir);
     vars = {
       projectName,
+      contractsDescription,
       portalkitChains: `file:../.portalkit/${tarballs["@portalkit/chains"]}`,
       portalkitCli: `file:./.portalkit/${tarballs["@portalkit/cli"]}`,
     };
   } else {
     const range = options.portalkitVersion ?? "latest";
-    vars = { projectName, portalkitChains: range, portalkitCli: range };
+    vars = { projectName, contractsDescription, portalkitChains: range, portalkitCli: range };
   }
 
   // 1. Copy template sets
-  for (const [set, dest] of Object.entries(TEMPLATE_SETS) as [keyof typeof TEMPLATE_SETS, string][]) {
-    const target = path.join(dir, dest);
-    await cp(templateDir(set), target, { recursive: true });
+  for (const [set, dest] of templateLayout(contracts)) {
+    await cp(templateDir(set), path.join(dir, dest), { recursive: true });
   }
   await applyTemplate(dir, vars);
+  if (contracts === "hardhat") await useHardhatScripts(dir);
   if (tarballs) await writeOverrides(dir, tarballs);
 
   // 2. Project config: networks.json is a snapshot of PortalKit's config (the project's own single source of truth).
@@ -85,12 +97,13 @@ export async function createProject(options: CreateOptions): Promise<CreateResul
   steps.push({ name: "scaffold", status: "done", detail: dir });
   log(`Created ${projectName} in ${dir}`);
 
-  // 3. git + forge-std
+  // 3. git (+ forge-std for Foundry)
   if (options.git === false) {
-    steps.push({ name: "git + forge-std", status: "skipped" });
+    steps.push({ name: "git init", status: "skipped" });
   } else {
     const git = run("git", ["init", "-q", "-b", "main"], dir);
     if (!git.ok) steps.push({ name: "git init", status: "failed", detail: git.detail });
+    else if (contracts === "hardhat") steps.push({ name: "git init", status: "done" });
     else {
       log(`Installing forge-std ${FORGE_STD_TAG}…`);
       const forge = run("forge", ["install", `foundry-rs/forge-std@${FORGE_STD_TAG}`], path.join(dir, "contracts"));
@@ -144,6 +157,21 @@ async function writeOverrides(dir: string, tarballs: Record<string, string>): Pr
     ([name, tgz]) => `  "${name}": "file:${path.join(dir, ".portalkit", tgz).replace(/\\/g, "/")}"`,
   );
   await writeFile(file, `${await readFile(file, "utf8")}overrides:\n${lines.join("\n")}\n`);
+}
+
+/** Hardhat's contracts/ is a pnpm workspace package; root scripts delegate to it. */
+async function useHardhatScripts(dir: string): Promise<void> {
+  const file = path.join(dir, "package.json");
+  const pkg = JSON.parse(await readFile(file, "utf8")) as { scripts: Record<string, string> };
+  pkg.scripts["contracts:build"] = "pnpm -C contracts build";
+  pkg.scripts["contracts:test"] = "pnpm -C contracts test";
+  pkg.scripts["deploy:anvil"] = "pnpm -C contracts deploy:anvil";
+  await writeFile(file, `${JSON.stringify(pkg, null, 2)}\n`);
+  const ws = path.join(dir, "pnpm-workspace.yaml");
+  const yaml = (await readFile(ws, "utf8")).replace('  - "web"\n', '  - "contracts"\n  - "web"\n');
+  // Hardhat → tsx → esbuild, whose postinstall only verifies its platform binary. pnpm 11 blocks
+  // dependency build scripts unless approved, which would fail `pnpm install`.
+  await writeFile(ws, `${yaml}# esbuild (via Hardhat/tsx): postinstall verifies its native binary\nallowBuilds:\n  esbuild: true\n`);
 }
 
 async function assertEmptyDir(dir: string): Promise<void> {

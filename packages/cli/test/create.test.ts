@@ -33,7 +33,7 @@ describe("createProject", () => {
     expect(result.projectName).toBe("demo");
     expect(result.steps.map((s) => [s.name, s.status])).toEqual([
       ["scaffold", "done"],
-      ["git + forge-std", "skipped"],
+      ["git init", "skipped"],
       ["pnpm install", "skipped"],
     ]);
 
@@ -78,6 +78,34 @@ describe("createProject", () => {
 
     const networks = JSON.parse(await readFile(path.join(dir, "networks.json"), "utf8"));
     expect(networks).toEqual(defaultNetworks);
+  });
+
+  it("scaffolds the Hardhat 3 preset as a workspace package", async () => {
+    const dir = path.join(await tmp(), "hh");
+    await createProject({ dir, contracts: "hardhat", ...offline, portalkitVersion: "^0.1.0" });
+    const files = await listFiles(dir);
+    expect(files).toEqual(
+      expect.arrayContaining([
+        "contracts/package.json",
+        "contracts/hardhat.config.ts",
+        "contracts/src/Counter.sol",
+        "contracts/test/Counter.ts",
+        "contracts/scripts/deploy.ts",
+      ]),
+    );
+    expect(files).not.toContain("contracts/foundry.toml");
+
+    const pkg = JSON.parse(await readFile(path.join(dir, "package.json"), "utf8"));
+    expect(pkg.scripts["contracts:test"]).toBe("pnpm -C contracts test");
+    expect(pkg.scripts["deploy:anvil"]).toBe("pnpm -C contracts deploy:anvil");
+    const contracts = JSON.parse(await readFile(path.join(dir, "contracts/package.json"), "utf8"));
+    expect(contracts.name).toBe("hh-contracts");
+    expect(contracts.devDependencies["@portalkit/chains"]).toBe("^0.1.0");
+
+    const ws = await readFile(path.join(dir, "pnpm-workspace.yaml"), "utf8");
+    expect(ws).toContain('  - "contracts"\n  - "web"');
+    expect(ws).toContain("esbuild: true");
+    expect(await readFile(path.join(dir, "README.md"), "utf8")).toContain("Hardhat 3 (viem)");
   });
 
   it("uses an explicit project name", async () => {
