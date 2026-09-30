@@ -5,7 +5,8 @@
   "license": "MIT",
   "type": "module",
   "bin": {
-    "portalkit": "./dist/portalkit.js"
+    "portalkit": "./dist/portalkit.js",
+    "create-portalkit-app": "./dist/create-portalkit-app.js"
   },
   "exports": {
     ".": {
@@ -13,7 +14,9 @@
       "import": "./dist/index.js"
     }
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsup",
     "lint": "eslint src test",
@@ -22,8 +25,13 @@
   },
   "dependencies": {
     "@portalkit/chains": "workspace:*",
+    "@portalkit/templates": "workspace:*",
     "commander": "^15.0.0",
     "picocolors": "^1.1.1",
+    "prompts": "^2.4.2",
     "viem": "^2.57.0"
+  },
+  "devDependencies": {
+    "@types/prompts": "^2.4.9"
   }
 }

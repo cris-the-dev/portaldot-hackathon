@@ -1,0 +1,13 @@
+node_modules/
+.next/
+.env
+.env.*
+!.env.example
+*.tsbuildinfo
+next-env.d.ts
+contracts/out/
+contracts/cache/
+contracts/broadcast/*/31337/
+
+# local-mode PortalKit tarballs (create-portalkit-app --portalkit)
+.portalkit/

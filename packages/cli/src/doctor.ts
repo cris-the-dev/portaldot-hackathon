@@ -82,7 +82,7 @@ export async function runDoctor(options: DoctorOptions): Promise<DoctorReport> {
   } catch (err) {
     const detail =
       err instanceof NetworkNotConfiguredError
-        ? `${err.missing.join(", ")} still TODO in config/networks.json`
+        ? `${err.missing.join(", ")} still TODO in the networks config`
         : (err as Error).message;
     checks.push({ id: "config", title: "Network config", status: "fail", detail });
     return report();

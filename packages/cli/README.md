@@ -23,4 +23,26 @@ Exit code is `1` if any check fails. RPC URLs can be overridden with `PORTALKIT_
 
 ## `create-portalkit-app`
 
-Coming in M3.
+```bash
+create-portalkit-app my-app          # prompts for a name when omitted
+```
+
+Generates a pnpm project:
+
+```
+my-app/
+  contracts/      Foundry: Counter, tests, deploy script (forge-std installed)
+  web/            Next.js + wagmi + viem; chains from ../networks.json via @portalkit/chains
+  networks.json   snapshot of PortalKit's network config (the project's own source of truth)
+  deployments/    <chainId>.json written by the deploy script, read by the web app
+```
+
+Scripts: `pnpm contracts:test`, `pnpm deploy:anvil`, `pnpm dev`, `pnpm check` (= `portalkit doctor`;
+not named `doctor` because `pnpm doctor` is a pnpm built-in).
+
+Options: `--no-git` (skip `git init` + `forge install`), `--no-install` (skip `pnpm install`),
+`--portalkit <path>` (development: `pnpm pack` the local PortalKit packages into `.portalkit/` and
+point dependencies/overrides at them — works before anything is published to npm).
+
+> The `@portalkit/*` packages are **not published to npm yet**, so for now use `--portalkit <path-to-this-repo>`
+> (after `pnpm build`).

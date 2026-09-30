@@ -1,0 +1,15 @@
+{
+  "name": "{{projectName}}",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm -C web dev",
+    "build": "pnpm -C web build",
+    "contracts:build": "cd contracts && forge build",
+    "contracts:test": "cd contracts && forge test",
+    "deploy:anvil": "cd contracts && forge script script/Deploy.s.sol --rpc-url anvil --broadcast",
+    "check": "portalkit doctor --config networks.json"
+  },
+  "devDependencies": {
+    "@portalkit/cli": "{{portalkitCli}}"
+  }
+}
