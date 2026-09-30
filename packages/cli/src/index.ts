@@ -1,2 +1,2 @@
-// Placeholder — implemented in M1/M3 (see CLAUDE.md §4).
-export {};
+export { runDoctor, type CheckResult, type CheckStatus, type DoctorOptions, type DoctorReport } from "./doctor.js";
+export { formatReport } from "./format.js";
