@@ -1,0 +1,37 @@
+{
+  "anvil": {
+    "vm": "evm",
+    "name": "Anvil (local)",
+    "chainId": 31337,
+    "rpcUrl": "http://127.0.0.1:8545",
+    "wsUrl": "ws://127.0.0.1:8545",
+    "nativeName": "Ether",
+    "nativeSymbol": "ETH",
+    "nativeDecimals": 18,
+    "explorer": null,
+    "testnet": true
+  },
+  "portaldot-v3": {
+    "vm": "evm",
+    "name": "Portaldot V3",
+    "chainId": "TODO",
+    "rpcUrl": "TODO",
+    "wsUrl": "TODO",
+    "nativeName": "Portaldot",
+    "nativeSymbol": "POT",
+    "nativeDecimals": "TODO",
+    "explorer": "TODO",
+    "ss58Prefix": "TODO",
+    "testnet": true,
+    "notes": "V3 (EVM) not public as of 2026-09-30. Fill every TODO from the V3 repo/docs — see docs/v3-findings.md."
+  },
+  "portaldot-v2": {
+    "vm": "substrate",
+    "name": "Portaldot V2 (native, local node)",
+    "wsUrl": "ws://127.0.0.1:9944",
+    "nativeSymbol": "POT",
+    "nativeDecimals": "TODO",
+    "ss58Prefix": 42,
+    "notes": "ss58Prefix from runtime source (portaldotVolunteer/Portaldot bin/node/runtime/src/lib.rs, SS58Prefix = 42, spec_version 1001). Not yet verified against a live node's system_properties (live runtime reportedly portaldot-1002). Not present in ss58-registry.json."
+  }
+}
