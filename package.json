@@ -4,7 +4,7 @@
   "description": "PortalKit — ship EVM dApps on Portaldot V3 in minutes",
   "packageManager": "pnpm@11.17.0",
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
   },
   "scripts": {
     "build": "turbo run build",

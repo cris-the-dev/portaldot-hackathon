@@ -22,7 +22,7 @@ config/networks.json  single source of truth for chain config
 
 ## Quickstart
 
-Requirements: Node ≥ 20, pnpm, [Foundry](https://book.getfoundry.sh/getting-started/installation).
+Requirements: Node ≥ 22 (24 recommended), pnpm, [Foundry](https://book.getfoundry.sh/getting-started/installation).
 
 ```bash
 git clone --recurse-submodules <repo> && cd portalkit
