@@ -10,7 +10,10 @@ Tokenized-RWA showcase built with PortalKit: deposit `MockRWA` (e.g. tokenized g
 
 Features: TVL, share price, your position and balance · deposit (auto-approve) / withdraw (withdrawing your whole
 position redeems all shares, so no dust is left) · history of your deposits/withdrawals and all yield
-distributions from event logs · issuer tools (mint, distribute yield), shown only to role holders.
+distributions from event logs · issuer tools (mint, distribute yield), shown only to role holders ·
+**simulated KYC compliance**: when on (default in `Deploy.s.sol`), only verified investors can receive shares,
+unverified wallets see deposits disabled with an explanation, withdrawals are never blocked, and the compliance
+role gets a panel to verify/revoke investors and toggle the requirement.
 
 ```bash
 anvil
@@ -18,5 +21,5 @@ cd contracts && PRIVATE_KEY=<anvil key #0> forge script script/Deploy.s.sol --rp
 pnpm -F @portalkit/vault-app dev          # http://localhost:3001 — connect with anvil account #0 (issuer)
 ```
 
-`pnpm -F @portalkit/vault-app e2e`: browser smoke test (mint → deposit → yield → +10% share price → withdraw → history),
+`pnpm -F @portalkit/vault-app e2e`: browser smoke test (mint → deposit → yield → +10% share price → withdraw → history → verify/revoke investor → unverified view),
 needs Chrome, a fresh Anvil with the contracts deployed, and `pnpm build && pnpm start`.

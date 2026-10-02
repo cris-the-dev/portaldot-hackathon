@@ -1,9 +1,10 @@
 "use client";
 
+import { ComplianceCard } from "@/components/compliance";
 import { HistoryCard } from "@/components/history";
 import { IssuerCard } from "@/components/issuer";
 import { TradeCard } from "@/components/trade";
-import { Card, Mono, Notice } from "@/components/ui";
+import { Badge, Card, Mono, Notice } from "@/components/ui";
 import { formatToken } from "@/lib/format";
 import { errorMessage, useActiveChain, useMounted } from "@/lib/hooks";
 import { useDeployment, useVaultState, type VaultState } from "@/lib/vault";
@@ -36,11 +37,22 @@ export default function VaultPage() {
 
       {d && state && (
         <>
+          <div className="flex flex-wrap items-center gap-2 text-xs">
+            <Badge tone={state.kycRequired ? "warn" : "muted"}>
+              {state.kycRequired ? "KYC-gated: verified investors only" : "Open vault: no KYC required"}
+            </Badge>
+            {mounted && state.user && state.kycRequired && (
+              <Badge tone={state.user.isVerified ? "ok" : "err"}>
+                {state.user.isVerified ? "You are verified" : "You are not verified"}
+              </Badge>
+            )}
+          </div>
           <Stats state={state} showUser={mounted} />
           <div className="grid gap-4 lg:grid-cols-[minmax(0,420px)_1fr]">
             <div className="flex flex-col gap-4">
               <TradeCard d={d} state={state} />
               <IssuerCard d={d} state={state} />
+              <ComplianceCard d={d} state={state} />
             </div>
             <HistoryCard d={d} state={state} />
           </div>

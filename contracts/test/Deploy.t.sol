@@ -20,5 +20,13 @@ contract DeployTest is Test {
         assertEq(vault.symbol(), "pvtGOLD");
         assertTrue(rwa.hasRole(rwa.ISSUER_ROLE(), admin));
         assertTrue(vault.hasRole(vault.YIELD_MANAGER_ROLE(), admin));
+        assertTrue(vault.kycRequired());
+        assertTrue(vault.isVerified(admin));
+    }
+
+    function test_DeployWithoutKyc() public {
+        (, RWAVault vault) = new Deploy().deploy(0xB0B, "Tokenized Bond", "tBOND", false);
+        assertFalse(vault.kycRequired());
+        assertEq(vault.symbol(), "pvtBOND");
     }
 }

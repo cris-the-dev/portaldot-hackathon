@@ -75,6 +75,7 @@ export function TradeCard({ d, state }: { d: Deployment; state: VaultState }) {
   };
 
   const blocked = !mounted || !isConnected || wrongNetwork;
+  const kycBlocked = mode === "deposit" && user !== undefined && !user.canDeposit;
 
   return (
     <Card>
@@ -119,6 +120,12 @@ export function TradeCard({ d, state }: { d: Deployment; state: VaultState }) {
         />
       </label>
       {inputError && <p className="mt-1 text-xs text-err">{inputError}</p>}
+      {kycBlocked && (
+        <Notice tone="warn">
+          This vault only accepts KYC-verified investors and your address is not verified yet. Ask the issuer to verify it.
+          Withdrawals are never blocked.
+        </Notice>
+      )}
       {previewShares !== undefined && !inputError && (
         <p className="mt-2 text-xs text-muted">
           ≈ {formatToken(previewShares, share.decimals)} {share.symbol} {mode === "deposit" ? "minted" : "burned"}
@@ -127,7 +134,7 @@ export function TradeCard({ d, state }: { d: Deployment; state: VaultState }) {
 
       <Button
         className="mt-4 w-full py-2.5"
-        disabled={blocked || tx.status.busy || amount === undefined || Boolean(inputError)}
+        disabled={blocked || kycBlocked || tx.status.busy || amount === undefined || Boolean(inputError)}
         onClick={submit}
       >
         {tx.status.busy

@@ -11,7 +11,7 @@ const SHOTS = process.env.SHOTS ?? path.resolve(import.meta.dirname, "screenshot
 const ANVIL = "http://127.0.0.1:8545";
 mkdirSync(SHOTS, { recursive: true });
 
-const fakeWallet = (rpc) => {
+const fakeWallet = ({ rpc, index }) => {
   let id = 0;
   const call = async (method, params = []) => {
     const res = await fetch(rpc, {
@@ -25,7 +25,7 @@ const fakeWallet = (rpc) => {
   };
   window.ethereum = {
     async request({ method, params }) {
-      if (method === "eth_requestAccounts" || method === "eth_accounts") return (await call("eth_accounts")).slice(0, 1);
+      if (method === "eth_requestAccounts" || method === "eth_accounts") return (await call("eth_accounts")).slice(index, index + 1);
       if (method === "wallet_switchEthereumChain" || method === "wallet_addEthereumChain") return null;
       if (method === "wallet_requestPermissions" || method === "wallet_getPermissions") return [{ parentCapability: "eth_accounts" }];
       return call(method, params);
@@ -40,7 +40,7 @@ const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
 const errors = [];
 page.on("pageerror", (e) => errors.push(`pageerror: ${e.message}`));
 page.on("console", (m) => m.type() === "error" && errors.push(`console: ${m.text()}`));
-await page.addInitScript(fakeWallet, ANVIL);
+await page.addInitScript(fakeWallet, { rpc: ANVIL, index: 0 });
 const shot = (name) => page.screenshot({ path: path.join(SHOTS, `${name}.png`), fullPage: true });
 const step = (s) => console.log(`• ${s}`);
 const stat = async (label) => (await page.locator("section", { hasText: label }).locator("p").nth(1).innerText()).trim();
@@ -97,6 +97,35 @@ const history = page.locator("section", { hasText: "History" });
 for (const kind of ["Deposit", "Yield", "Withdraw"]) await history.getByText(kind, { exact: true }).first().waitFor();
 step(`history rows: ${await history.locator("tbody tr").count()}`);
 await shot("2-after-withdraw");
+
+// Compliance: issuer verifies then revokes Anvil account #1
+const INVESTOR = "0x70997970C51812dc3A010C7d01b50e0d17dc79C8";
+const compliance = page.locator("section", { hasText: "Compliance" });
+await page.getByText("KYC-gated: verified investors only").waitFor();
+await compliance.getByLabel("Investor address").fill(INVESTOR);
+await compliance.getByRole("button", { name: "Verify", exact: true }).click();
+await compliance.getByText(/Verified 0x7099/).waitFor({ timeout: 30000 });
+await compliance.getByText(/Verified investors \(2\)/).waitFor({ timeout: 10000 });
+step("compliance: verified investor #1 (list shows 2)");
+await compliance.getByLabel("Investor address").fill(INVESTOR);
+await compliance.getByRole("button", { name: "Revoke", exact: true }).click();
+await compliance.getByText(/Revoked 0x7099/).waitFor({ timeout: 30000 });
+await compliance.getByText(/Verified investors \(1\)/).waitFor({ timeout: 10000 });
+step("compliance: revoked investor #1 (list shows 1)");
+
+// Unverified investor (account #1) sees deposits blocked
+const page2 = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+page2.on("pageerror", (e) => errors.push(`pageerror(2): ${e.message}`));
+await page2.addInitScript(fakeWallet, { rpc: ANVIL, index: 1 });
+await page2.goto(APP);
+await page2.getByRole("button", { name: "Connect wallet" }).first().click();
+await page2.getByText("You are not verified").waitFor();
+await page2.getByText(/only accepts KYC-verified investors/).waitFor();
+if (!(await page2.getByRole("button", { name: /Deposit|Connect wallet/ }).last().isDisabled())) throw new Error("deposit should be disabled");
+if (await page2.getByText("Compliance", { exact: true }).count()) throw new Error("compliance panel must be hidden for investors");
+step("unverified investor: deposit disabled with KYC notice; no admin panels");
+await page2.screenshot({ path: path.join(SHOTS, "4-unverified.png"), fullPage: true });
+await page2.close();
 
 await page.setViewportSize({ width: 390, height: 844 });
 await page.reload();

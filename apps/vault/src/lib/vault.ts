@@ -21,6 +21,8 @@ export interface VaultState {
   totalSupply: bigint;
   /** Assets (base units) redeemable for one whole share. */
   assetsPerShare: bigint;
+  /** Simulated compliance: only verified accounts may receive shares. */
+  kycRequired: boolean;
   user?: {
     assetBalance: bigint;
     shares: bigint;
@@ -29,6 +31,10 @@ export interface VaultState {
     allowance: bigint;
     isIssuer: boolean;
     isYieldManager: boolean;
+    isComplianceManager: boolean;
+    isVerified: boolean;
+    /** False when KYC is required and this account is not verified. */
+    canDeposit: boolean;
   };
 }
 
@@ -50,9 +56,10 @@ export function useVaultState(d: Deployment | undefined): { state: VaultState | 
       { ...vault, functionName: "decimals" },
       { ...rwa, functionName: "ISSUER_ROLE" },
       { ...vault, functionName: "YIELD_MANAGER_ROLE" },
+      { ...vault, functionName: "COMPLIANCE_ROLE" },
     ],
   });
-  const [assetSymbol, assetDecimals, shareSymbol, shareDecimals, issuerRole, yieldRole] = meta.data ?? [];
+  const [assetSymbol, assetDecimals, shareSymbol, shareDecimals, issuerRole, yieldRole, complianceRole] = meta.data ?? [];
   const oneShare = shareDecimals === undefined ? 0n : 10n ** BigInt(shareDecimals);
 
   const live = useReadContracts({
@@ -68,19 +75,35 @@ export function useVaultState(d: Deployment | undefined): { state: VaultState | 
       { ...rwa, functionName: "allowance", args: [user, vault.address] },
       { ...rwa, functionName: "hasRole", args: [issuerRole ?? `0x${"00".repeat(32)}`, user] },
       { ...vault, functionName: "hasRole", args: [yieldRole ?? `0x${"00".repeat(32)}`, user] },
+      { ...vault, functionName: "hasRole", args: [complianceRole ?? `0x${"00".repeat(32)}`, user] },
+      { ...vault, functionName: "kycRequired" },
+      { ...vault, functionName: "isVerified", args: [user] },
     ],
   });
 
   let state: VaultState | undefined;
   if (meta.data && live.data && assetSymbol !== undefined && assetDecimals !== undefined && shareSymbol !== undefined && shareDecimals !== undefined) {
-    const [totalAssets, totalSupply, assetsPerShare, assetBalance, shares, maxWithdraw, allowance, isIssuer, isYieldManager] =
-      live.data;
+    const [
+      totalAssets,
+      totalSupply,
+      assetsPerShare,
+      assetBalance,
+      shares,
+      maxWithdraw,
+      allowance,
+      isIssuer,
+      isYieldManager,
+      isComplianceManager,
+      kycRequired,
+      isVerified,
+    ] = live.data;
     state = {
       asset: { symbol: assetSymbol, decimals: assetDecimals },
       share: { symbol: shareSymbol, decimals: shareDecimals },
       totalAssets,
       totalSupply,
       assetsPerShare,
+      kycRequired,
       ...(address
         ? {
             user: {
@@ -92,6 +115,9 @@ export function useVaultState(d: Deployment | undefined): { state: VaultState | 
               allowance,
               isIssuer,
               isYieldManager,
+              isComplianceManager,
+              isVerified,
+              canDeposit: !kycRequired || isVerified,
             },
           }
         : {}),

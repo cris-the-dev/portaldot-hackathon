@@ -8,19 +8,33 @@ import {RWAVault} from "../src/RWAVault.sol";
 
 /// @notice Deploys MockRWA + RWAVault.
 ///   forge script script/Deploy.s.sol --rpc-url anvil --broadcast
-/// Env: PRIVATE_KEY (required), RWA_NAME / RWA_SYMBOL (optional).
+/// Env: PRIVATE_KEY (required), RWA_NAME / RWA_SYMBOL / KYC_REQUIRED (optional, default true).
 /// On --broadcast, addresses are written to config/deployments/<chainId>.json for the frontends.
 contract Deploy is Script {
     function run() external returns (MockRWA rwa, RWAVault vault) {
-        uint256 pk = vm.envUint("PRIVATE_KEY");
+        return deploy(
+            vm.envUint("PRIVATE_KEY"),
+            vm.envOr("RWA_NAME", string("Tokenized Gold")),
+            vm.envOr("RWA_SYMBOL", string("tGOLD")),
+            vm.envOr("KYC_REQUIRED", true)
+        );
+    }
+
+    function deploy(uint256 pk, string memory name, string memory symbol, bool kycRequired)
+        public
+        returns (MockRWA rwa, RWAVault vault)
+    {
         address admin = vm.addr(pk);
-        string memory name = vm.envOr("RWA_NAME", string("Tokenized Gold"));
-        string memory symbol = vm.envOr("RWA_SYMBOL", string("tGOLD"));
         uint256 deployBlock = block.number;
 
         vm.startBroadcast(pk);
         rwa = new MockRWA(name, symbol, admin);
         vault = new RWAVault(rwa, string.concat("PortalVault ", symbol), string.concat("pv", symbol), admin);
+        if (kycRequired) {
+            // Simulated compliance: only verified investors may hold shares; the issuer starts verified.
+            vault.setVerified(admin, true);
+            vault.setKycRequired(true);
+        }
         vm.stopBroadcast();
 
         console2.log("chainId", block.chainid);
