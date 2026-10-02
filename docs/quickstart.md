@@ -40,6 +40,9 @@ pnpm dev                                           # http://localhost:3000 → c
 ```bash
 portalkit doctor                        # anvil: RPC, chainId, eth_* API, deployer balance
 portalkit doctor --network portaldot-v3 # fails with the list of TODO values until V3 is configured
+portalkit doctor --network portaldot-mainnet --address <SS58>
+                                        # native side, live: ss58/decimals/symbol vs config, runtime,
+                                        # EVM/WASM availability, POT balance
 ```
 
 ## 3. Deploy and call any contract — Dashboard
@@ -52,8 +55,9 @@ pnpm -F @portalkit/dashboard dev        # http://localhost:3000
 2. **Deploy**: upload `contracts/out/MockRWA.sol/MockRWA.json` → fill `name_`, `symbol_`, `admin` → Deploy.
 3. **Playground** (linked from the deploy result): query `name()`, send `mint(...)`, see the decoded `Transfer`
    event, *Load events*.
-4. **Address**: paste an SS58 or 0x address → re-encodings per configured prefix; the H160↔SS58 mapping
-   reports *pending-v3*.
+4. **Address**: paste an SS58 or 0x address → re-encodings per configured prefix and, for SS58, the **live
+   native POT balance** on Portaldot mainnet; the H160↔SS58 mapping reports *pending-v3*.
+5. The home page's **V3 readiness** card reads mainnet live and shows whether EVM is available yet.
 
 ## 4. Showcase — PortalVault (tokenized RWA, ERC-4626)
 
@@ -65,6 +69,9 @@ pnpm -F @portalkit/vault-app dev        # http://localhost:3001, connect as Anvi
 ```
 
 Mint tGOLD (issuer tools) → deposit → *Distribute* yield → share price rises → withdraw → history.
+
+KYC is on by default (only the issuer is verified). To try another wallet, verify its address in the **Compliance** panel
+first — unverified wallets see deposits disabled (withdrawals are never blocked). Deploy with `KYC_REQUIRED=false` for an open vault.
 
 ## 5. When Portaldot V3 is released
 
