@@ -31,8 +31,17 @@
     "name": "Portaldot V2 (native, local node)",
     "wsUrl": "ws://127.0.0.1:9944",
     "nativeSymbol": "POT",
-    "nativeDecimals": "TODO",
+    "nativeDecimals": 14,
     "ss58Prefix": 42,
-    "notes": "ss58Prefix from runtime source (portaldotVolunteer/Portaldot bin/node/runtime/src/lib.rs, SS58Prefix = 42, spec_version 1001). Not yet verified against a live node's system_properties (live runtime reportedly portaldot-1002). Not present in ss58-registry.json."
+    "notes": "Local dev node (portaldot_dev --dev). ss58Prefix/decimals match the live mainnet runtime (portaldot 1002), verified via system_properties on 2026-10-02."
+  },
+  "portaldot-mainnet": {
+    "vm": "substrate",
+    "name": "Portaldot Mainnet (native)",
+    "wsUrl": "wss://mainnet.portaldot.io",
+    "nativeSymbol": "POT",
+    "nativeDecimals": 14,
+    "ss58Prefix": 42,
+    "notes": "Verified 2026-10-02 via system_properties: ss58Format 42, tokenDecimals 14, tokenSymbol POT; runtime portaldot specVersion 1002; no eth_* RPC methods (EVM not enabled)."
   }
 }
