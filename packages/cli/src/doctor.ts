@@ -1,8 +1,6 @@
-import {
-  NetworkNotConfiguredError,
-  getEvmChain,
-  type LoadOptions,
-} from "@portalkit/chains";
+import { NetworkNotConfiguredError, UnknownNetworkError, getEvmChain, getNetwork, type LoadOptions } from "@portalkit/chains";
+import type { SubstrateRpc } from "@portalkit/address";
+import { runSubstrateDoctor } from "./doctor-substrate.js";
 import {
   createPublicClient,
   formatUnits,
@@ -35,7 +33,7 @@ export interface DoctorReport {
 
 export interface DoctorOptions extends LoadOptions {
   network: string;
-  /** Account to check the balance of. Falls back to the account of env PRIVATE_KEY. */
+  /** Account to check the balance of: EVM address (else env PRIVATE_KEY's account) or SS58 for substrate networks. */
   address?: string;
   /** Minimum native balance (human units, e.g. "0.1") for the deployer check. */
   minBalance?: string;
@@ -43,6 +41,8 @@ export interface DoctorOptions extends LoadOptions {
   transport?: Transport;
   /** Per-request timeout in ms for the default HTTP transport. */
   timeoutMs?: number;
+  /** Override the Substrate RPC connection for `vm: "substrate"` networks (tests). */
+  substrateRpc?: SubstrateRpc;
 }
 
 /** JSON-RPC methods every EVM tool (wallets, Foundry, viem) relies on. */
@@ -68,6 +68,17 @@ export async function runDoctor(options: DoctorOptions): Promise<DoctorReport> {
     checks,
     ok: checks.every((c) => c.status !== "fail"),
   });
+
+  // Substrate (native) networks get their own checks.
+  try {
+    if (getNetwork(options.network, options).vm === "substrate") return await runSubstrateDoctor(options);
+  } catch (err) {
+    if (err instanceof UnknownNetworkError) {
+      checks.push({ id: "config", title: "Network config", status: "fail", detail: err.message });
+      return report();
+    }
+    throw err;
+  }
 
   // 1. Config
   let chain: Chain;

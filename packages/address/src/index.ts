@@ -51,3 +51,4 @@ export function substrateToEvm(ss58: string, { strategy }: Pick<ConvertOptions, 
 function resolve(strategy: AddressMappingStrategy | string): AddressMappingStrategy {
   return typeof strategy === "string" ? strategies.get(strategy) : strategy;
 }
+export * from "./substrate.js";

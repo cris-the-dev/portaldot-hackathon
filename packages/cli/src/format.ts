@@ -11,7 +11,7 @@ const ICON: Record<CheckStatus, string> = {
 export function formatReport(report: DoctorReport): string {
   const lines = [pc.bold(`portalkit doctor — ${report.network}`), ""];
   for (const check of report.checks) {
-    lines.push(`${ICON[check.status]} ${check.title.padEnd(28)} ${pc.dim(check.detail)}`);
+    lines.push(`${ICON[check.status]} ${check.title.padEnd(30)} ${pc.dim(check.detail)}`);
   }
   lines.push("", report.ok ? pc.green("All required checks passed.") : pc.red("Some checks failed."));
   return lines.join("\n");

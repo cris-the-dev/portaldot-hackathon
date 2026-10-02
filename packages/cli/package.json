@@ -24,6 +24,7 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@portalkit/address": "workspace:*",
     "@portalkit/chains": "workspace:*",
     "@portalkit/templates": "workspace:*",
     "commander": "^15.0.0",

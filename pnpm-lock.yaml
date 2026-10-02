@@ -151,6 +151,9 @@ importers:
 
   packages/cli:
     dependencies:
+      '@portalkit/address':
+        specifier: workspace:*
+        version: link:../address
       '@portalkit/chains':
         specifier: workspace:*
         version: link:../chains

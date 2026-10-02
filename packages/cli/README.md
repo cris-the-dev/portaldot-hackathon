@@ -19,6 +19,25 @@ portalkit doctor -n portaldot-v3 --json  # once V3 values are filled in
 portalkit doctor -c ./my-networks.json -n my-chain -a 0x…
 ```
 
+### Native (Substrate) networks
+
+For `vm: "substrate"` entries (e.g. `portaldot-mainnet`, `portaldot-v2`) doctor checks Portaldot's native side instead:
+
+| Check | Fails when |
+|---|---|
+| Node reachable | WebSocket RPC down |
+| Chain properties match config | node's `ss58Format` / `tokenDecimals` / `tokenSymbol` differ from config (TODO fields → warning showing the node's values) |
+| Runtime | — (shows `specName` / `specVersion`) |
+| Execution environments | — shows whether the node exposes EVM (`eth_*`) and WASM contracts (`contracts_*`): tells you when V3's EVM is live |
+| Account balance | `--address <SS58>` free POT < `--min-balance` |
+
+```bash
+portalkit doctor -n portaldot-mainnet --address 5GHBWSmwFuzown3aG1edDEGN6tD1qqCmxmMRmWiQ1YnFbBKk
+# ✔ Chain properties match config  ss58 42 · 14 decimals · POT
+# ✔ Execution environments         EVM (eth_*): not available · WASM contracts: available
+# ✔ Account balance                42158.157… POT free · nonce 18
+```
+
 Exit code is `1` if any check fails. RPC URLs can be overridden with `PORTALKIT_RPC_URL_<KEY>`.
 
 ## `create-portalkit-app`

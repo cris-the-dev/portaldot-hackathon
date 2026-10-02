@@ -23,7 +23,20 @@ strategies.register(myV3Strategy);
 evmToSubstrate("0x…", { strategy: myV3Strategy.id, ss58Prefix });
 ```
 
+## Native (Substrate) helpers
+
+Raw-RPC helpers for Portaldot's native side (current `@polkadot/api` cannot fully decode the V2 runtime):
+
+```ts
+import { connectSubstrate, getNativeChainInfo, getNativeAccount } from "@portalkit/address";
+
+const rpc = await connectSubstrate("wss://mainnet.portaldot.io");
+await getNativeChainInfo(rpc);     // chain, runtime, properties, { evm, wasmContracts }
+await getNativeAccount(rpc, ss58); // { nonce, free, reserved, … } — AccountInfo layout verified on spec 1002
+rpc.close();
+```
+
 ## SS58 prefix note
 
 `ss58-registry.json` in `portaldotVolunteer/Portaldot` is an unmodified upstream Substrate copy and has **no Portaldot entry**.
-The V2 runtime source sets `SS58Prefix = 42`, which is what `config/networks.json` records for `portaldot-v2` (not yet verified on a live node).
+The V2 runtime sets `SS58Prefix = 42`, verified on mainnet via `system_properties` (2026-10-02).
