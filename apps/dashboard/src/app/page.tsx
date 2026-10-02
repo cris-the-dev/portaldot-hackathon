@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { formatUnits, type Address } from "viem";
 import { useBalance, useConnection, usePublicClient } from "wagmi";
+import { NativeStatusCard } from "@/components/native";
 import { Badge, Button, Card, Mono, Notice } from "@/components/ui";
 import { AddNetworkButton } from "@/components/wallet";
 import { errorMessage, useActiveChain, useMounted } from "@/lib/hooks";
@@ -24,6 +25,7 @@ export default function HomePage() {
         <FaucetCard />
       </div>
       <NetworksCard />
+      <NativeStatusCard />
     </div>
   );
 }

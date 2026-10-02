@@ -12,6 +12,7 @@ import {
 import { TODO, getNetwork } from "@portalkit/chains";
 import { useMemo, useState } from "react";
 import { getAddress } from "viem";
+import { NativeAccountCard } from "@/components/native";
 import { Badge, Card, Input, Label, Mono, Notice } from "@/components/ui";
 import { networkStatuses } from "@/lib/wagmi";
 
@@ -63,6 +64,8 @@ export default function AddressPage() {
           </div>
         )}
       </Card>
+
+      {kind === "ss58" && <NativeAccountCard ss58={value} />}
 
       <Card title="Same-VM formats">
         {kind === "evm" && (
