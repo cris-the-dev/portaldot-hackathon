@@ -1,9 +1,11 @@
 import { describe, expect, it } from "vitest";
+import { parseNetworksConfig } from "@portalkit/chains";
 import rawNetworks from "../../../config/networks.json";
 import {
   InvalidSs58AddressError,
   MappingNotAvailableError,
   PENDING_V3_STRATEGY_ID,
+  REVIVE_STRATEGY_ID,
   Ss58PrefixNotConfiguredError,
   StrategyRegistry,
   UnknownStrategyError,
@@ -14,6 +16,7 @@ import {
   isValidSs58,
   pendingV3Strategy,
   reencodeSs58,
+  reviveStrategy,
   ss58PrefixFor,
   strategies,
   substrateToEvm,
@@ -82,9 +85,9 @@ describe("ss58PrefixFor (reads config/networks.json)", () => {
     expect(ss58PrefixFor("portaldot-v2", noEnv)).toBe(rawNetworks["portaldot-v2"].ss58Prefix);
   });
 
-  it("throws while Portaldot V3's prefix is TODO", () => {
-    expect(rawNetworks["portaldot-v3"].ss58Prefix).toBe("TODO");
-    expect(() => ss58PrefixFor("portaldot-v3", noEnv)).toThrow(Ss58PrefixNotConfiguredError);
+  it("throws while a network's prefix is TODO", () => {
+    const config = parseNetworksConfig({ x: { ...rawNetworks["portaldot-v3"], ss58Prefix: "TODO" } });
+    expect(() => ss58PrefixFor("x", { config, env: {} })).toThrow(Ss58PrefixNotConfiguredError);
   });
 
   it("throws for networks without a prefix", () => {
@@ -93,12 +96,25 @@ describe("ss58PrefixFor (reads config/networks.json)", () => {
 });
 
 describe("mapping strategies", () => {
-  it("defaults to the pending V3 strategy, which refuses to guess", () => {
-    expect(strategies.ids()).toEqual([PENDING_V3_STRATEGY_ID]);
+  it("registers revive (default) and the pending V3 strategy, which refuses to guess", () => {
+    expect(strategies.ids()).toEqual([REVIVE_STRATEGY_ID, PENDING_V3_STRATEGY_ID]);
     expect(() => evmToSubstrate(EVM, { strategy: PENDING_V3_STRATEGY_ID, ss58Prefix: 42 })).toThrow(
       MappingNotAvailableError,
     );
     expect(() => substrateToEvm(ALICE_42, { strategy: pendingV3Strategy })).toThrow(MappingNotAvailableError);
+  });
+
+  // Test vector from the Portaldot V3 testnet guide (MetaMask address -> mapped Substrate address).
+  const GUIDE_EVM = "0xf7eC65d11e35375A250e474059a917B537804142";
+  const GUIDE_SS58 = "5Hfmuhj1AHrTBJiC9zUPnJo1cfG2G52LLMwofSigBnjtto8Y";
+
+  it("revive: maps H160 to AccountId32 = H160 ++ 0xEE×12 (V3 guide vector) and back", () => {
+    expect(evmToSubstrate(GUIDE_EVM.toLowerCase(), { strategy: REVIVE_STRATEGY_ID, ss58Prefix: 42 })).toBe(GUIDE_SS58);
+    expect(substrateToEvm(GUIDE_SS58, { strategy: reviveStrategy })).toBe(GUIDE_EVM);
+  });
+
+  it("revive: refuses to guess the EVM address of a native account", () => {
+    expect(() => substrateToEvm(ALICE_42, { strategy: reviveStrategy })).toThrow(MappingNotAvailableError);
   });
 
   it("validates input before calling the strategy", () => {
@@ -120,7 +136,7 @@ describe("mapping strategies", () => {
     const registry = new StrategyRegistry();
     registry.register(fake);
     expect(registry.has("test-fake")).toBe(true);
-    expect(registry.list()).toHaveLength(2);
+    expect(registry.list()).toHaveLength(3);
 
     const ss58 = registry.get("test-fake").evmToSubstrate(EVM, 42);
     expect(isValidSs58(ss58, 42)).toBe(true);

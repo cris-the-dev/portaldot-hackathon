@@ -41,12 +41,12 @@ describe("bundled config/networks.json", () => {
     expect(chain.blockExplorers).toBeUndefined();
   });
 
-  it("keeps Portaldot V3 pending until its values are known", () => {
+  it("keeps Portaldot V3 pending until its RPC is known", () => {
     expect(() => getEvmChain("portaldot-v3", noEnv)).toThrow(NetworkNotConfiguredError);
     const status = listNetworks(noEnv).find((n) => n.key === "portaldot-v3");
     expect(status?.status).toBe("pending");
     expect(status?.pending).toEqual(
-      expect.arrayContaining(["chainId", "rpcUrl", "nativeDecimals", "explorer", "faucetUrl", "ss58Prefix"]),
+      expect.arrayContaining(["rpcUrl", "explorer", "faucetUrl"]),
     );
   });
 
@@ -62,7 +62,7 @@ describe("error reporting", () => {
       expect.unreachable();
     } catch (err) {
       expect(err).toBeInstanceOf(NetworkNotConfiguredError);
-      expect((err as NetworkNotConfiguredError).missing).toEqual(["chainId", "rpcUrl", "nativeDecimals"]);
+      expect((err as NetworkNotConfiguredError).missing).toEqual(["rpcUrl"]);
       expect((err as Error).message).toContain(rpcUrlEnvVar("portaldot-v3"));
     }
   });
@@ -122,9 +122,17 @@ describe("env overrides", () => {
     expect(rpcUrlEnvVar("portaldot-v3")).toBe("PORTALKIT_RPC_URL_PORTALDOT_V3");
   });
 
-  it("an RPC override alone does not make a pending network ready", () => {
+  it("an RPC override makes V3 ready once its other required values are known", () => {
     const env = { PORTALKIT_RPC_URL_PORTALDOT_V3: "https://rpc.example.org" };
-    expect(() => getEvmChain("portaldot-v3", { env })).toThrow(/chainId, nativeDecimals/);
+    const chain = getEvmChain("portaldot-v3", { env });
+    expect(chain.id).toBe(rawNetworks["portaldot-v3"].chainId);
+    expect(chain.rpcUrls.default.http).toEqual(["https://rpc.example.org"]);
+  });
+
+  it("an RPC override alone does not make a network with a TODO chainId ready", () => {
+    const config = parseNetworksConfig({ x: { ...rawNetworks["portaldot-v3"], chainId: "TODO" } });
+    const env = { PORTALKIT_RPC_URL_X: "https://rpc.example.org" };
+    expect(() => getEvmChain("x", { config, env })).toThrow(/chainId/);
   });
 
   it("overrides wsUrl for substrate networks", () => {

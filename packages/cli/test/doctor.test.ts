@@ -57,7 +57,7 @@ describe("runDoctor (mocked RPC)", () => {
     const report = await runDoctor({ ...base, network: "portaldot-v3", transport: fakeRpc() });
     expect(report.ok).toBe(false);
     expect(report.checks).toHaveLength(1);
-    expect(report.checks[0]?.detail).toMatch(/chainId, rpcUrl, nativeDecimals still TODO/);
+    expect(report.checks[0]?.detail).toMatch(/rpcUrl still TODO/);
   });
 
   it("fails when the RPC is down", async () => {

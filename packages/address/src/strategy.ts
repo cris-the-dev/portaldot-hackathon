@@ -1,4 +1,5 @@
-import type { Address } from "viem";
+import { getAddress, type Address } from "viem";
+import { decodeSs58, encodeSs58 } from "./ss58.js";
 
 /**
  * How an EVM account (H160) relates to a Substrate account (AccountId32 / SS58) on a given chain.
@@ -50,6 +51,37 @@ export const pendingV3Strategy: AddressMappingStrategy = {
   },
 };
 
+export const REVIVE_STRATEGY_ID = "revive";
+
+const EE_SUFFIX = "ee".repeat(12);
+
+/**
+ * pallet-revive mapping (Portaldot V3 testnet): AccountId32 = H160 ++ 12 bytes of 0xEE.
+ * Verified against the V3 testnet guide's example (0xf7eC…4142 ↔ 5Hfmuhj1…to8Y), see docs/v3-findings.md.
+ * Fund this SS58 address to pay gas for the H160 account.
+ *
+ * SS58 → H160 is only defined here for accounts with the 0xEE suffix (the exact inverse).
+ * TODO(v3): native accounts map via keccak256(AccountId32)[12..] upstream; not yet verified on Portaldot.
+ */
+export const reviveStrategy: AddressMappingStrategy = {
+  id: REVIVE_STRATEGY_ID,
+  description: "pallet-revive (V3 testnet): AccountId32 = H160 ++ 0xEE×12",
+  evmToSubstrate(h160, ss58Prefix) {
+    return encodeSs58(`${h160.toLowerCase() as Address}${EE_SUFFIX}`, ss58Prefix);
+  },
+  substrateToEvm(ss58) {
+    const { accountId } = decodeSs58(ss58);
+    if (!accountId.toLowerCase().endsWith(EE_SUFFIX)) {
+      throw new MappingNotAvailableError(
+        REVIVE_STRATEGY_ID,
+        "This is a native Substrate account, not one derived from an EVM address. Its EVM address on Portaldot V3 " +
+          "is not verified yet (see docs/v3-findings.md, item 4).",
+      );
+    }
+    return getAddress(accountId.slice(0, 42));
+  },
+};
+
 export class UnknownStrategyError extends Error {
   override name = "UnknownStrategyError";
 }
@@ -58,7 +90,7 @@ export class UnknownStrategyError extends Error {
 export class StrategyRegistry {
   readonly #strategies = new Map<string, AddressMappingStrategy>();
 
-  constructor(initial: readonly AddressMappingStrategy[] = [pendingV3Strategy]) {
+  constructor(initial: readonly AddressMappingStrategy[] = [reviveStrategy, pendingV3Strategy]) {
     for (const strategy of initial) this.register(strategy);
   }
 

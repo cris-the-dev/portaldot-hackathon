@@ -13,18 +13,18 @@
   },
   "portaldot-v3": {
     "vm": "evm",
-    "name": "Portaldot V3",
-    "chainId": "TODO",
+    "name": "Portaldot V3 Testnet",
+    "chainId": 420420777,
     "rpcUrl": "TODO",
     "wsUrl": "TODO",
     "nativeName": "Portaldot",
-    "nativeSymbol": "POT",
-    "nativeDecimals": "TODO",
+    "nativeSymbol": "tPOTv3",
+    "nativeDecimals": 14,
     "explorer": "TODO",
     "faucetUrl": "TODO",
-    "ss58Prefix": "TODO",
+    "ss58Prefix": 42,
     "testnet": true,
-    "notes": "V3 (EVM) not public as of 2026-09-30. Fill every TODO from the V3 repo/docs — see docs/v3-findings.md."
+    "notes": "From the V3 testnet guide (github.com/ItsCogumellum/portaldot-v3-testnet-guide, 2026-10-02): chainId 420420777, tPOTv3, 14 decimals, EVM via pallet-revive; ss58 42 from its mapped-address example. RPC TODO: the published endpoints were withdrawn on 2026-10-09 (testnet upgrade) — set PORTALKIT_RPC_URL_PORTALDOT_V3 or fill rpcUrl once new ones are announced. Testnet chainId is not final for mainnet. See docs/v3-findings.md."
   },
   "portaldot-v2": {
     "vm": "substrate",

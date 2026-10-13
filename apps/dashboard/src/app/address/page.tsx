@@ -2,6 +2,7 @@
 
 import {
   MappingNotAvailableError,
+  REVIVE_STRATEGY_ID,
   decodeSs58,
   detectAddressKind,
   encodeSs58,
@@ -139,6 +140,12 @@ export default function AddressPage() {
               <Mono>{mapping.ok}</Mono>
             </dd>
           </dl>
+        )}
+        {mapping?.ok && kind === "evm" && strategyId === REVIVE_STRATEGY_ID && (
+          <Notice>
+            On Portaldot V3, gas for this EVM account is paid from the Substrate account above: send native tokens
+            there (e.g. from the node explorer) and they show up in MetaMask.
+          </Notice>
         )}
         {mapping?.pending && <Notice tone="warn">{mapping.pending}</Notice>}
         {mapping?.err && <Notice tone="err">{mapping.err}</Notice>}

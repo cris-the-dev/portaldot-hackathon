@@ -101,8 +101,13 @@ await shot("3-playground");
 await page.getByRole("link", { name: "Address", exact: true }).click();
 await page.getByPlaceholder("0x… or 5…").fill("5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY");
 await page.getByText("Substrate · SS58 (prefix 42)").waitFor();
-await page.getByText(/not public yet/).waitFor();
-step("SS58 decoded; mapping reports pending-v3");
+await page.getByText(/native Substrate account/).waitFor();
+step("SS58 decoded; revive refuses to guess a native account's H160");
+// V3 testnet guide vector: MetaMask address -> mapped Substrate account (H160 ++ 0xEE×12)
+await page.getByPlaceholder("0x… or 5…").fill("0xf7eC65d11e35375A250e474059a917B537804142");
+await page.getByText("5Hfmuhj1AHrTBJiC9zUPnJo1cfG2G52LLMwofSigBnjtto8Y").waitFor();
+await page.getByText(/gas for this EVM account is paid from/).waitFor();
+step("EVM → SS58 via revive matches the V3 guide vector");
 await shot("4-address");
 
 // Mobile width: no horizontal overflow
