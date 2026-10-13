@@ -12,7 +12,9 @@
 3. **Anvil-first.** Every EVM feature is exercised on a local Anvil node (unit tests, integration tests, browser E2E) before it
    ever touches V3.
 4. **Strategies for what V3 hasn't specified.** The H160 ↔ SS58 account mapping is an `AddressMappingStrategy` interface with a
-   registry. Today only `pending-v3` exists and it refuses to guess; the real one plugs in without touching callers.
+   registry. `revive` (default) implements pallet-revive's H160 → AccountId32 rule (`H160 ++ 0xEE×12`), checked against
+   the V3 testnet guide's example; for native accounts' H160 (not yet confirmed for Portaldot) it refuses to guess.
+   `pending-v3` stays as an explicit "unknown" option.
 5. **Verify, don't assume.** Native-side facts (SS58 42, POT 14 decimals, `AccountInfo` layout) were read from live mainnet and
    are covered by fixtures + an opt-in live test.
 
@@ -26,7 +28,7 @@ config/networks.json ─┬─► @portalkit/chains ──┬─► @portalkit/c
                       └─► generated projects (snapshot)
 
 @portalkit/address ── SS58 encode/decode/validate
-                   ── AddressMappingStrategy + StrategyRegistry (pending-v3)
+                   ── AddressMappingStrategy + StrategyRegistry (revive, pending-v3)
                    ── native RPC: connectSubstrate, getNativeChainInfo, getNativeAccount
 
 @portalkit/templates ── files/base · files/foundry · files/hardhat · files/web

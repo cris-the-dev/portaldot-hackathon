@@ -4,13 +4,41 @@ Tracks the open questions in CLAUDE.md §5. **Nothing here is assumed**: each it
 answered with a source or still open. When an answer lands, update `config/networks.json`
 (replace the `"TODO"`) and the code that depends on it.
 
-Last checked: **2026-10-02**
+Last checked: **2026-10-13**
 
 ## Status of V3 source
 
 - Official org: https://github.com/portaldotVolunteer (Portaldot, Portaldot-node, DeveloperPlatform, Portaldot-Extension, Whitepaper, …).
 - `Portaldot/Cargo.toml` on `main` includes `frame/contracts` (WASM/ink!) but **no `pallet-evm` / Frontier** → V3 (EVM) code is not public yet.
 - Dev docs: https://portaldot-dev.readthedocs.io
+
+## Check of 2026-10-13
+
+- **V3 testnet guide found**: [ItsCogumellum/portaldot-v3-testnet-guide](https://github.com/ItsCogumellum/portaldot-v3-testnet-guide)
+  (self-described "official PortaldotV3 Testnet documentation and sample code, provided by the Portaldot team"; English
+  translation of *PortaldotV3 Testnet说明文档*; commits 2026-10-02, FAQ 2026-10-07). Hosted on a personal account, so treat as
+  semi-official until the organizers confirm.
+  - Substrate `wss://testnetv3-node.feso-apps.xyz` · EVM JSON-RPC `https://testnetv3-eth-rpc.feso-apps.xyz` ·
+    **chainId 420420777** · **tPOTv3, 14 decimals** · node explorer `https://node-console.feso-apps.xyz/` (polkadot.js-apps style).
+  - **EVM = Revive** (`reviveApi` runtime calls, `Revive → call` extrinsic) → pallet-revive, not Frontier. Other teams
+    confirm pallet-revive / PolkaVM / `resolc` ([PotScan](https://github.com/yeziR4/potscan)).
+  - Tooling documented: MetaMask, Remix ("Injected MetaMask"), Hardhat (solc 0.8.24). **Foundry is untested/undocumented.**
+  - **No faucet**: tokens are sent from the node explorer to the account's *mapped Substrate address*.
+  - FAQ: testnet chainId is not final for mainnet; mainnet EVM tooling, account-mapping migration and launch date unconfirmed.
+- **Testnet offline.** 2026-10-09 announcement (via [PortalPulse](https://github.com/JokerFuFu/portaldot-hacker-house-2026-portalpulse)):
+  testnet being upgraded, old RPC info no longer valid, new RPC to be published. On 2026-10-13 all three `*.feso-apps.xyz`
+  hosts return NXDOMAIN → `rpcUrl`/`wsUrl` stay `TODO` (override with `PORTALKIT_RPC_URL_PORTALDOT_V3` when announced).
+- **Account mapping verified offline** from the guide's example `0xf7eC65d11e35375A250e474059a917B537804142` ↔
+  `5Hfmuhj1AHrTBJiC9zUPnJo1cfG2G52LLMwofSigBnjtto8Y`: the SS58 decodes to
+  `f7ec65d11e35375a250e474059a917b537804142` + `ee`×12 — exactly pallet-revive's rule (AccountId32 = H160 ++ 0xEE×12), prefix 42.
+  Implemented as the `revive` strategy in `@portalkit/address` with this vector. The reverse for *native* accounts
+  (upstream: `keccak256(AccountId32)[12..]`) is not confirmed for Portaldot → the strategy refuses instead of guessing.
+- **Contracts compile for PolkaVM**: `forge flatten` + `resolc` 1.4.0 (`@parity/resolc`) builds `MockRWA` (35.9 KB) and
+  `RWAVault` (75.7 KB) blobs (`PVM` magic header) without source changes. Whether Portaldot's revive also accepts plain EVM
+  (solc) bytecode, and its code-size limit, are unknown until the testnet is back.
+- **Build period**: 2026-10-13 16:00 UTC → 2026-11-06 04:00 UTC; demo day 2026-11-07/08
+  ([KuCoin](https://www.kucoin.com/news/community/PORTAL/6ac1973d38a26400079273b5)). `portaldotVolunteer/Portaldot` still
+  has no V3 code (last push 2026-06-25).
 
 ## Check of 2026-10-02
 
@@ -37,13 +65,13 @@ Last checked: **2026-10-02**
 
 | # | Question | Status | Answer / source | Affects |
 |---|---|---|---|---|
-| 1 | EVM implementation (Frontier / pallet-evm?) | ⏳ open | — | doctor, RPC assumptions |
-| 2 | Standard Ethereum JSON-RPC (`eth_*`)? endpoint? MetaMask-compatible? | ⏳ open | — | `networks.json` `rpcUrl`, dashboard |
-| 3 | EVM chainId; POT decimals on the EVM side | ⏳ open | Native side verified: 14 decimals (mainnet). EVM side unknown. | `networks.json` `chainId`, `nativeDecimals` |
-| 4 | H160 ↔ SS58 account mapping | ⏳ open | — | `@portalkit/address` (`pending-v3` strategy) |
+| 1 | EVM implementation (Frontier / pallet-evm?) | 🟡 likely | **pallet-revive** (Revive extrinsics/runtime API in the testnet guide; PolkaVM + `resolc` per other teams). Plain-EVM bytecode support unknown. | doctor, templates, deploy wizard |
+| 2 | Standard Ethereum JSON-RPC (`eth_*`)? endpoint? MetaMask-compatible? | 🟡 documented | Yes per guide (MetaMask/Remix/Hardhat); endpoint withdrawn 2026-10-09, new one pending. | `networks.json` `rpcUrl`, dashboard |
+| 3 | EVM chainId; POT decimals on the EVM side | 🟡 testnet | Testnet: chainId **420420777**, tPOTv3, **14 decimals** (guide). Not final for mainnet. | `networks.json` `chainId`, `nativeDecimals` |
+| 4 | H160 ↔ SS58 account mapping | ✅ H160→SS58 | `H160 ++ 0xEE×12` (guide vector, decoded). Native SS58→H160 unconfirmed. | `@portalkit/address` (`revive` strategy) |
 | 5 | Precompiles for EVM → WASM/native calls | ⏳ open | — | dual-VM features |
-| 6 | Public testnet + faucet? node binary OSes? | ⏳ open | No public testnet found (2026-10-02); V2 binaries Linux/macOS only. | faucet panel, M1 |
-| 7 | Block explorer / Blockscout for EVM; verification | ⏳ open | — | `networks.json` `explorer` |
+| 6 | Public testnet + faucet? node binary OSes? | 🟡 | Testnet exists but offline since 2026-10-09 (upgrade); no faucet (send from node explorer). | faucet panel, M1 |
+| 7 | Block explorer / Blockscout for EVM; verification | 🟡 | Only a Substrate node explorer (node-console); no EVM explorer/verification documented. | `networks.json` `explorer` |
 | 8 | Judging rules, submission requirements, best track | ⏳ open | Not published yet; ask organizers on Discord. | M4 |
 
 ## SS58 prefix (for `@portalkit/address`)
@@ -55,7 +83,7 @@ Last checked: **2026-10-02**
   `spec_version: 1001`, `pub const SS58Prefix: u16 = 42;` (L189). 42 = generic `substrate` prefix.
   Recorded as `portaldot-v2.ss58Prefix = 42` in `config/networks.json`.
 - ✅ **Verified on the live chain (2026-10-02):** mainnet `system_properties.ss58Format = 42` (runtime 1002).
-- V3 may change it → `portaldot-v3.ss58Prefix` stays `"TODO"`.
+- V3 testnet: the guide's mapped address `5Hfmuhj1…` is encoded with prefix 42 → `portaldot-v3.ss58Prefix = 42`.
 
 ## How to verify on a running node
 

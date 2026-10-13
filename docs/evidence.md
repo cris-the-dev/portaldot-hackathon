@@ -5,7 +5,7 @@ Record every deployment and demo transaction on Portaldot here (M1 / M4). Addres
 
 ## Portaldot V3 (EVM)
 
-_Pending — V3 not public as of 2026-10-02 (see [`v3-findings.md`](v3-findings.md))._
+_Pending — V3 testnet offline for an upgrade since 2026-10-09 (see [`v3-findings.md`](v3-findings.md))._
 
 | Date | Network (chainId) | Contract / action | Address | Tx hash | Explorer |
 |---|---|---|---|---|---|

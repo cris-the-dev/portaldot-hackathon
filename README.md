@@ -4,8 +4,9 @@
 Plus **PortalVault**, a compliance-aware tokenized-RWA vault built entirely with the kit.
 
 > Portaldot Hacker House 2026 · Track: *Ecosystem DApps* or *Modular Cloud & Middleware* (to be confirmed against the official rules).
-> Portaldot V3 (EVM) is not public yet (checked 2026-10-02), so the EVM side runs **Anvil-first** with every V3 value as an explicit
-> `TODO` in [`config/networks.json`](config/networks.json). The **native side already runs against live Portaldot mainnet**.
+> Portaldot V3's testnet (pallet-revive, chainId 420420777) is offline for an upgrade since 2026-10-09, so the EVM side runs
+> **Anvil-first**; V3's known values are in [`config/networks.json`](config/networks.json) and only its new RPC is still `TODO`.
+> The **native side already runs against live Portaldot mainnet**.
 
 ---
 
@@ -123,13 +124,14 @@ browser E2E smoke tests for the dashboard and vault · CI on every push (lint, t
 |---|---|
 | Kit, dashboard, vault on Anvil | ✅ done, E2E-tested |
 | Native side on Portaldot mainnet (doctor, native account view, V3 readiness) | ✅ live |
-| V3 EVM values in `networks.json` | ⏳ V3 not public ([findings](docs/v3-findings.md)) |
-| Real H160 ↔ SS58 strategy | ⏳ waits for V3's account mapping |
+| V3 EVM values in `networks.json` | 🟡 chainId / decimals / SS58 from the V3 testnet guide; RPC pending (testnet upgrading, [findings](docs/v3-findings.md)) |
+| Real H160 ↔ SS58 strategy | ✅ `revive`: H160 → SS58 (`H160 ++ 0xEE×12`) with the guide's test vector · ⏳ native SS58 → H160 |
 | Contracts deployed on Portaldot V3 testnet + tx evidence | ⏳ [`docs/evidence.md`](docs/evidence.md) |
 | `npx create-portalkit-app` | ⏳ packages ready; npm publish pending (works today via `--portalkit <path>`) |
 
-**On V3 day:** fill `portaldot-v3` in `config/networks.json` → `portalkit doctor -n portaldot-v3` → implement the mapping
-strategy → deploy → record evidence. If V3 ships an EVM ↔ native/WASM precompile, the dashboard grows a true **dual-VM view**
+**When the testnet is back:** set its RPC (`rpcUrl` or `PORTALKIT_RPC_URL_PORTALDOT_V3`) → `portalkit doctor -n portaldot-v3` →
+fund the mapped SS58 address shown by the dashboard → deploy (solc bytecode, or `resolc` PolkaVM blobs — both contracts
+already compile with `resolc` 1.4.0) → record evidence. If V3 ships an EVM ↔ native/WASM precompile, the dashboard grows a true **dual-VM view**
 (one account, both balances, calls across VMs).
 
 **After the hackathon:** publish the npm packages, contract verification + explorer links once Portaldot has an EVM explorer,
