@@ -4,9 +4,9 @@
 Plus **PortalVault**, a compliance-aware tokenized-RWA vault built entirely with the kit.
 
 > Portaldot Hacker House 2026 · Track: *Ecosystem DApps* or *Modular Cloud & Middleware* (to be confirmed against the official rules).
-> Portaldot V3's testnet (pallet-revive, chainId 420420777) is offline for an upgrade since 2026-10-09, so the EVM side runs
-> **Anvil-first**; V3's known values are in [`config/networks.json`](config/networks.json) and only its new RPC is still `TODO`.
-> The **native side already runs against live Portaldot mainnet**.
+> **Configured for the live Portaldot V3 testnet** (pallet-revive EVM, chainId 420420777, both its EVM RPC and its
+> Substrate node pass `portalkit doctor`), and everything is also tested **Anvil-first**. All values live in
+> [`config/networks.json`](config/networks.json). The native side also runs against live Portaldot mainnet.
 
 ---
 
@@ -35,7 +35,29 @@ developers — but today they hit a wall:
 | **Dashboard** | Connect wallet + one-click *add network* · **deploy wizard** (Foundry/Hardhat artifact → auto-generated constructor form) · **ABI playground** (read/write any contract, decoded events) · **address converter** with the **live native POT balance** of any SS58 account · faucet panel · **V3 readiness** monitor | Everything a Solidity dev needs in a browser — no scripts |
 | **PortalVault** | `MockRWA` (tokenized gold) + `RWAVault` (ERC-4626): deposit, issuer-distributed yield, withdraw, history · **simulated KYC** (only verified investors hold shares; withdrawals never blocked) | Proves the kit end-to-end and hits Portaldot's tokenized-RWA narrative, compliance included |
 
-### Live on Portaldot today (no V3 needed)
+### Live on Portaldot V3 testnet today
+
+```text
+$ portalkit doctor -n portaldot-v3 --address 0xd9838a86cf83c28ee486544060d1ca4ca2971071
+✔ Network config                 Portaldot V3 Testnet (chainId 420420777) → https://test-evm-rpc-v3.portaldot.dev
+✔ RPC reachable                  block #118914 in 996 ms
+✔ chainId matches config         420420777
+✔ Standard Ethereum JSON-RPC     9 required methods OK
+✔ EIP-1559 & client info         all supported
+✔ Deployer balance               182.9884679822373337 tPOT (0xd9838a86cf83c28ee486544060d1ca4ca2971071 via --address)
+
+$ portalkit doctor -n portaldot-v3-native --address 5GyuKkF3Hpv6aRwFa5BtcWvXLqGDjGfMLi1f2jFraJ4Zuef5
+✔ Node reachable                 PortaldotV3 Test · node 3.0.0-dev-fddd43141f2 · block #118915
+✔ Chain properties match config  ss58 42 · 14 decimals · tPOT
+✔ Runtime                        portaldot-v3 spec 3002
+✔ Execution environments         EVM: available · WASM contracts: available
+✔ Account balance                183.08846798223733 tPOT free · nonce 2
+```
+
+The same account seen from both VMs: `0xd983…1071` maps to `5Gyu…uef5` (`H160 ++ 0xEE×12`), and the EVM side reports
+the native 14-decimal balance with 18 decimals (minus the existential deposit).
+
+Mainnet (V2, native only):
 
 ```text
 $ portalkit doctor -n portaldot-mainnet --address 5GHBWSmwFuzown3aG1edDEGN6tD1qqCmxmMRmWiQ1YnFbBKk
@@ -43,7 +65,7 @@ $ portalkit doctor -n portaldot-mainnet --address 5GHBWSmwFuzown3aG1edDEGN6tD1qq
 ✔ Node reachable                 Portaldot Mainnet · node 2.0.0 · block #2708129
 ✔ Chain properties match config  ss58 42 · 14 decimals · POT
 ✔ Runtime                        portaldot spec 1002
-✔ Execution environments         EVM (eth_*): not available · WASM contracts: available
+✔ Execution environments         EVM: not available · WASM contracts: available
 ✔ Account balance                42158.157… POT free · nonce 18
 ```
 
@@ -72,10 +94,11 @@ cd contracts && PRIVATE_KEY=0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae
 cd .. && pnpm -F @portalkit/dashboard dev               # http://localhost:3000
 pnpm -F @portalkit/vault-app dev                        # http://localhost:3001
 
-node packages/cli/dist/portalkit.js doctor -n portaldot-mainnet   # native checks against live mainnet
+node packages/cli/dist/portalkit.js doctor -n portaldot-v3        # V3 testnet EVM RPC
+node packages/cli/dist/portalkit.js doctor -n portaldot-v3-native # V3 testnet Substrate node
 ```
 
-Full walkthrough (scaffolding a new app, dashboard tour, vault demo, V3 day checklist): [`docs/quickstart.md`](docs/quickstart.md).
+Full walkthrough (scaffolding a new app, dashboard tour, vault demo, deploying to V3 testnet): [`docs/quickstart.md`](docs/quickstart.md).
 
 ## Architecture
 
@@ -90,10 +113,10 @@ flowchart LR
   tpl["@portalkit/templates<br/>Foundry · Hardhat 3 · Next.js"] --> cli
   contracts["contracts/<br/>MockRWA · RWAVault"] -->|"Deploy.s.sol writes"| dep["config/deployments/&lt;chainId&gt;.json"]
   dep --> vault
-  dash -->|"eth_* (EVM)"| evm[("Anvil today<br/>Portaldot V3 EVM")]
+  dash -->|"eth_* (EVM)"| evm[("Anvil · Portaldot V3 testnet<br/>(pallet-revive eth-rpc)")]
   vault --> evm
   cli --> evm
-  dash -->|"Substrate RPC"| native[("Portaldot native<br/>mainnet · local node")]
+  dash -->|"Substrate RPC"| native[("Portaldot native<br/>V3 testnet · mainnet · local node")]
   cli --> native
 ```
 
@@ -115,7 +138,7 @@ config/             networks.json + deployments/<chainId>.json
 docs/               quickstart, architecture, v3-findings, video script, evidence
 ```
 
-**Quality:** 60 Foundry tests (incl. fuzzing and an inflation-attack scenario) · 88 Vitest tests + 1 opt-in live mainnet test ·
+**Quality:** 60 Foundry tests (incl. fuzzing and an inflation-attack scenario) · 91 Vitest tests + opt-in live tests ·
 browser E2E smoke tests for the dashboard and vault · CI on every push (lint, typecheck, tests, `forge fmt`/`build`/`test`).
 
 ## Status & roadmap
@@ -124,14 +147,13 @@ browser E2E smoke tests for the dashboard and vault · CI on every push (lint, t
 |---|---|
 | Kit, dashboard, vault on Anvil | ✅ done, E2E-tested |
 | Native side on Portaldot mainnet (doctor, native account view, V3 readiness) | ✅ live |
-| V3 EVM values in `networks.json` | 🟡 chainId / decimals / SS58 from the V3 testnet guide; RPC pending (testnet upgrading, [findings](docs/v3-findings.md)) |
+| V3 testnet in `networks.json` + `portalkit doctor` | ✅ EVM RPC + Substrate node verified live 2026-10-20 ([findings](docs/v3-findings.md)); explorer/faucet not announced |
 | Real H160 ↔ SS58 strategy | ✅ `revive`: H160 → SS58 (`H160 ++ 0xEE×12`) with the guide's test vector · ⏳ native SS58 → H160 |
 | Contracts deployed on Portaldot V3 testnet + tx evidence | ⏳ [`docs/evidence.md`](docs/evidence.md) |
 | `npx create-portalkit-app` | ⏳ packages ready; npm publish pending (works today via `--portalkit <path>`) |
 
-**When the testnet is back:** set its RPC (`rpcUrl` or `PORTALKIT_RPC_URL_PORTALDOT_V3`) → `portalkit doctor -n portaldot-v3` →
-fund the mapped SS58 address shown by the dashboard → deploy (solc bytecode, or `resolc` PolkaVM blobs — both contracts
-already compile with `resolc` 1.4.0) → record evidence. If V3 ships an EVM ↔ native/WASM precompile, the dashboard grows a true **dual-VM view**
+**Next on V3:** fund the deployer's mapped SS58 address (shown by the dashboard) → `forge script … --rpc-url portaldot_v3
+--broadcast` (V3 runs plain solc bytecode; dry-runs of both contracts already succeed) → record evidence. If V3 ships an EVM ↔ native/WASM precompile, the dashboard grows a true **dual-VM view**
 (one account, both balances, calls across VMs).
 
 **After the hackathon:** publish the npm packages, contract verification + explorer links once Portaldot has an EVM explorer,

@@ -48,14 +48,14 @@ contracts/ ── MockRWA, RWAVault ── script/Deploy.s.sol ──► config/
   because the V2 runtime (Substrate 3.0, spec 1002) is not fully decodable by current api versions.
 - `decodeAccountInfo` — 80 bytes: `nonce, consumers, providers, sufficients` (u32) + `free, reserved, miscFrozen, feeFrozen`
   (u128). Verified on mainnet: nonce equals `system_accountNextIndex`, metadata contains `UpgradedToTripleRefCount`.
-  Any other size throws instead of mis-decoding (V3 may change the layout).
+  Any other size throws instead of mis-decoding. The V3 testnet keeps 80 bytes; its 4th u128 is `flags`, not a balance.
 
 ### `@portalkit/cli`
 - `portalkit doctor` dispatches on `vm`:
   - **EVM:** config → `eth_blockNumber` → chainId vs config → 9 required `eth_*` methods (fail) + 4 optional (warn) → deployer
     balance (`--address` or `PRIVATE_KEY`).
   - **Substrate:** config → node info → `system_properties` vs config (mismatch = fail, config TODO = warn with the node's
-    value) → runtime → execution environments (`eth_*` present? `contracts_*` present?) → SS58 balance.
+    value) → runtime → execution environments (`ReviveApi` / `ContractsApi` runtime APIs, else `eth_*` / `contracts_*` RPC) → SS58 balance.
 - `create-portalkit-app` copies template sets, replaces `{{placeholders}}`, writes the networks snapshot, then optionally runs
   `git init`, `forge install forge-std` (Foundry) and `pnpm install`. Hardhat projects make `contracts/` a workspace package and
   pre-approve esbuild's build script (pnpm 11 blocks it otherwise). `--portalkit <path>` packs the local packages with

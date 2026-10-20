@@ -4,13 +4,47 @@ Tracks the open questions in CLAUDE.md §5. **Nothing here is assumed**: each it
 answered with a source or still open. When an answer lands, update `config/networks.json`
 (replace the `"TODO"`) and the code that depends on it.
 
-Last checked: **2026-10-13**
+Last checked: **2026-10-20**
 
 ## Status of V3 source
 
 - Official org: https://github.com/portaldotVolunteer (Portaldot, Portaldot-node, DeveloperPlatform, Portaldot-Extension, Whitepaper, …).
 - `Portaldot/Cargo.toml` on `main` includes `frame/contracts` (WASM/ink!) but **no `pallet-evm` / Frontier** → V3 (EVM) code is not public yet.
 - Dev docs: https://portaldot-dev.readthedocs.io
+
+## Check of 2026-10-20 — testnet back
+
+Source: organizers' announcement on Discord, "PortaldotV3 Testnet: Updated Network Info & Testnet Token Distribution"
+(previous endpoints are no longer in use):
+
+| | |
+|---|---|
+| Node explorer | https://node-console.portaldot.dev/ (Substrate, polkadot.js-apps style) |
+| Substrate node | `wss://test-node-v3.portaldot.dev` → `portaldot-v3-native` |
+| EVM JSON-RPC | `https://test-evm-rpc-v3.portaldot.dev` → `portaldot-v3.rpcUrl` |
+| EVM chainId | 420420777 |
+| Tokens | sent by the team to each participant's **native SS58 (5…) address**, no faucet; missing → DM the admins with the SS58 address. The team never asks for seed phrases or private keys. |
+
+Verified directly (read-only RPC):
+- **EVM RPC:** `eth_chainId` = `0x190f1ca9` (420420777 ✅), `web3_clientVersion` = `eth-rpc/main-fddd431…` (pallet-revive's
+  eth-rpc service). `portalkit doctor -n portaldot-v3` passes: 9/9 required `eth_*` methods, EIP-1559 fee fields, balance.
+- **Substrate:** `system_properties` = ss58 42, **14 decimals, symbol `tPOT`** (the guide said `tPOTv3`); runtime
+  `portaldot-v3` spec **3002**, node `3.0.0-dev-fddd43141f2`. `state_getRuntimeVersion.apis` includes both **`ReviveApi`**
+  (`0x8c403e5c4a9fd442`) and **`ContractsApi`** (`0x68b66ba122c93fa7`) → EVM *and* WASM contracts on one runtime. The node
+  itself has no `eth_*` RPC (eth-rpc is a separate service), so detection now uses the runtime APIs.
+  `portalkit doctor -n portaldot-v3-native` passes.
+- **EVM decimals = 18** (not 14): for a funded account, `eth_getBalance` = 182.988467982237333700 × 10¹⁸ while the mapped
+  native account (`H160 ++ 0xEE×12`) holds 183.08846798223733 tPOT at 14 decimals — same digits, scaled ×10⁴, minus
+  0.1 tPOT (likely the existential deposit, which the EVM view excludes). This also confirms the `revive` mapping on live data.
+- **AccountInfo layout:** still 80 bytes, but the 4th u128 is `flags` (bit 127 set), not `feeFrozen` (newer
+  `pallet-balances`). `decodeAccountInfo` keeps the V2 field names; nothing reads that slot.
+- **Plain EVM bytecode is accepted** (no `resolc` needed). Dry-runs via `eth_estimateGas` / `eth_call` (no signing):
+  solc-built `MockRWA` (3.9 KB) and `RWAVault` (7.9 KB) creations succeed; `0xfe` fails with `InvalidInstruction`, `revert`
+  is reported as an EVM revert, and a create's `eth_call` returns the runtime code → revive's EVM interpreter.
+- **Gas is not Ethereum-scale:** block gas limit `2^64−1`, base fee ≈ 37 160 wei; estimates are 7.1 × 10¹⁵ (MockRWA) and
+  1.5 × 10¹⁶ (RWAVault). `eth_estimateGas` ignores the sender's balance, and no indexed EVM transaction was found in the
+  last ~400 blocks, so the **real deployment fee is unknown until the first deploy**.
+- No EVM explorer and no faucet announced → `explorer` / `faucetUrl` stay `TODO`; no EVM WebSocket announced → `wsUrl` `TODO`.
 
 ## Check of 2026-10-13
 
@@ -25,7 +59,7 @@ Last checked: **2026-10-13**
   - Tooling documented: MetaMask, Remix ("Injected MetaMask"), Hardhat (solc 0.8.24). **Foundry is untested/undocumented.**
   - **No faucet**: tokens are sent from the node explorer to the account's *mapped Substrate address*.
   - FAQ: testnet chainId is not final for mainnet; mainnet EVM tooling, account-mapping migration and launch date unconfirmed.
-- **Testnet offline.** 2026-10-09 announcement (via [PortalPulse](https://github.com/JokerFuFu/portaldot-hacker-house-2026-portalpulse)):
+- **Testnet offline** (back on 2026-10-20 with new endpoints, see above). 2026-10-09 announcement (via [PortalPulse](https://github.com/JokerFuFu/portaldot-hacker-house-2026-portalpulse)):
   testnet being upgraded, old RPC info no longer valid, new RPC to be published. On 2026-10-13 all three `*.feso-apps.xyz`
   hosts return NXDOMAIN → `rpcUrl`/`wsUrl` stay `TODO` (override with `PORTALKIT_RPC_URL_PORTALDOT_V3` when announced).
 - **Account mapping verified offline** from the guide's example `0xf7eC65d11e35375A250e474059a917B537804142` ↔
@@ -65,13 +99,13 @@ Last checked: **2026-10-13**
 
 | # | Question | Status | Answer / source | Affects |
 |---|---|---|---|---|
-| 1 | EVM implementation (Frontier / pallet-evm?) | 🟡 likely | **pallet-revive** (Revive extrinsics/runtime API in the testnet guide; PolkaVM + `resolc` per other teams). Plain-EVM bytecode support unknown. | doctor, templates, deploy wizard |
-| 2 | Standard Ethereum JSON-RPC (`eth_*`)? endpoint? MetaMask-compatible? | 🟡 documented | Yes per guide (MetaMask/Remix/Hardhat); endpoint withdrawn 2026-10-09, new one pending. | `networks.json` `rpcUrl`, dashboard |
-| 3 | EVM chainId; POT decimals on the EVM side | 🟡 testnet | Testnet: chainId **420420777**, tPOTv3, **14 decimals** (guide). Not final for mainnet. | `networks.json` `chainId`, `nativeDecimals` |
-| 4 | H160 ↔ SS58 account mapping | ✅ H160→SS58 | `H160 ++ 0xEE×12` (guide vector, decoded). Native SS58→H160 unconfirmed. | `@portalkit/address` (`revive` strategy) |
+| 1 | EVM implementation (Frontier / pallet-evm?) | ✅ testnet | **pallet-revive** (`ReviveApi` runtime API, eth-rpc service) and it **runs plain EVM bytecode** (dry-runs 2026-10-20). | doctor, templates, deploy wizard |
+| 2 | Standard Ethereum JSON-RPC (`eth_*`)? endpoint? MetaMask-compatible? | ✅ testnet | `https://test-evm-rpc-v3.portaldot.dev`; doctor passes (9/9 required, EIP-1559). MetaMask per guide. | `networks.json` `rpcUrl`, dashboard |
+| 3 | EVM chainId; POT decimals on the EVM side | ✅ testnet | chainId **420420777**; EVM side **18 decimals** (native tPOT: 14). Not final for mainnet. | `networks.json` `chainId`, `nativeDecimals` |
+| 4 | H160 ↔ SS58 account mapping | ✅ H160→SS58 | `H160 ++ 0xEE×12` (guide vector + live balances). Native SS58→H160 unconfirmed. | `@portalkit/address` (`revive` strategy) |
 | 5 | Precompiles for EVM → WASM/native calls | ⏳ open | — | dual-VM features |
-| 6 | Public testnet + faucet? node binary OSes? | 🟡 | Testnet exists but offline since 2026-10-09 (upgrade); no faucet (send from node explorer). | faucet panel, M1 |
-| 7 | Block explorer / Blockscout for EVM; verification | 🟡 | Only a Substrate node explorer (node-console); no EVM explorer/verification documented. | `networks.json` `explorer` |
+| 6 | Public testnet + faucet? node binary OSes? | ✅ testnet | Public testnet since 2026-10-20; no faucet: the team sends tPOT to participants' native addresses. | faucet panel, M1 |
+| 7 | Block explorer / Blockscout for EVM; verification | 🟡 | Only the Substrate node explorer (node-console.portaldot.dev); no EVM explorer/verification announced. | `networks.json` `explorer` |
 | 8 | Judging rules, submission requirements, best track | ⏳ open | Not published yet; ask organizers on Discord. | M4 |
 
 ## SS58 prefix (for `@portalkit/address`)
@@ -93,7 +127,7 @@ curl -s -H 'Content-Type: application/json' \
   -d '{"id":1,"jsonrpc":"2.0","method":"system_properties","params":[]}' http://127.0.0.1:9944
 # -> ss58Format, tokenDecimals, tokenSymbol
 
-# EVM side (V3, once available)
-cast chain-id --rpc-url <V3_RPC>
-cast client   --rpc-url <V3_RPC>
+# EVM side (V3 testnet)
+cast chain-id --rpc-url https://test-evm-rpc-v3.portaldot.dev
+cast client   --rpc-url https://test-evm-rpc-v3.portaldot.dev
 ```

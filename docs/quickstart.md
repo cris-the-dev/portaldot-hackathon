@@ -73,10 +73,13 @@ Mint tGOLD (issuer tools) → deposit → *Distribute* yield → share price ris
 KYC is on by default (only the issuer is verified). To try another wallet, verify its address in the **Compliance** panel
 first — unverified wallets see deposits disabled (withdrawals are never blocked). Deploy with `KYC_REQUIRED=false` for an open vault.
 
-## 5. When Portaldot V3 is released
+## 5. Portaldot V3 testnet
 
-1. Fill every `TODO` of `portaldot-v3` in `config/networks.json` (chainId, rpcUrl, decimals, explorer, faucet, ss58Prefix).
-2. `portalkit doctor --network portaldot-v3` must pass.
-3. Implement the real H160↔SS58 strategy in `@portalkit/address` (see its README).
-4. Deploy: `forge script script/Deploy.s.sol --rpc-url portaldot_v3 --broadcast` (set `PORTALDOT_V3_RPC_URL`),
-   record the tx hashes in `docs/evidence.md`.
+`portaldot-v3` (EVM, chainId 420420777) and `portaldot-v3-native` (Substrate) are configured in `config/networks.json`.
+
+1. Get tPOT: the team sends it to your **native** SS58 address (no faucet). To use it from MetaMask, paste your `0x…`
+   address into the dashboard's **Address** page (`revive` strategy) and send tPOT to the SS58 account shown there.
+2. `portalkit doctor -n portaldot-v3 --address <0x…>` must pass (balance > 0).
+3. Put the deployer key in `contracts/.env` as `PRIVATE_KEY` (never commit it), then
+   `forge script script/Deploy.s.sol --rpc-url portaldot_v3 --broadcast`. Plain solc bytecode works on V3.
+4. Record the tx hashes in `docs/evidence.md`.

@@ -5,7 +5,8 @@ Record every deployment and demo transaction on Portaldot here (M1 / M4). Addres
 
 ## Portaldot V3 (EVM)
 
-_Pending — V3 testnet offline for an upgrade since 2026-10-09 (see [`v3-findings.md`](v3-findings.md))._
+_Pending — testnet live since 2026-10-20; waiting for a funded deployer. Dry-runs (`eth_estimateGas`) of both solc-built
+contracts succeed (see [`v3-findings.md`](v3-findings.md))._
 
 | Date | Network (chainId) | Contract / action | Address | Tx hash | Explorer |
 |---|---|---|---|---|---|
@@ -14,11 +15,18 @@ _Pending — V3 testnet offline for an upgrade since 2026-10-09 (see [`v3-findin
 | | | Deposit / yield / withdraw demo | | | |
 
 ```bash
-# when V3 is configured in config/networks.json
-node packages/cli/dist/portalkit.js doctor -n portaldot-v3
-cd contracts && PORTALDOT_V3_RPC_URL=<rpc> PRIVATE_KEY=<funded key> \
-  forge script script/Deploy.s.sol --rpc-url portaldot_v3 --broadcast
+node packages/cli/dist/portalkit.js doctor -n portaldot-v3 --address <deployer 0x…>
+# PRIVATE_KEY in contracts/.env (never committed)
+cd contracts && forge script script/Deploy.s.sol --rpc-url portaldot_v3 --broadcast
 ```
+
+## Portaldot V3 testnet (read-only checks)
+
+| Date | Check | Result |
+|---|---|---|
+| 2026-10-20 | `portalkit doctor -n portaldot-v3 --address 0xd9838a86cf83c28ee486544060d1ca4ca2971071` | ✅ chainId 420420777 · 9/9 required `eth_*` · EIP-1559 · balance 182.99 tPOT |
+| 2026-10-20 | `portalkit doctor -n portaldot-v3-native --address 5GyuKkF3Hpv6aRwFa5BtcWvXLqGDjGfMLi1f2jFraJ4Zuef5` | ✅ ss58 42 · 14 decimals · tPOT · runtime `portaldot-v3` 3002 · EVM available · WASM contracts available |
+| 2026-10-20 | `eth_estimateGas` create of solc-built MockRWA / RWAVault | ✅ accepted (7.1e15 / 1.5e16 gas) |
 
 ## Portaldot mainnet (native, read-only checks)
 
