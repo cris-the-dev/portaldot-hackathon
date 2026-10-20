@@ -77,7 +77,8 @@ first — unverified wallets see deposits disabled (withdrawals are never blocke
 
 `portaldot-v3` (EVM, chainId 420420777) and `portaldot-v3-native` (Substrate) are configured in `config/networks.json`.
 
-1. Get tPOT: the team sends it to your **native** SS58 address (no faucet). To use it from MetaMask, paste your `0x…`
+1. Get tPOT: the team sends it to the **native** SS58 address (`5…`, wallet: https://www.portaldot.world) submitted in
+   your DoraHacks project dashboard (no faucet). To use it from MetaMask, paste your `0x…`
    address into the dashboard's **Address** page (`revive` strategy) and send tPOT to the SS58 account shown there.
 2. `portalkit doctor -n portaldot-v3 --address <0x…>` must pass (balance > 0).
 3. Put the deployer key in `contracts/.env` as `PRIVATE_KEY` (never commit it), then

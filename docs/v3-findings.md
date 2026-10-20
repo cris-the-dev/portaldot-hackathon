@@ -44,6 +44,15 @@ Verified directly (read-only RPC):
 - **Gas is not Ethereum-scale:** block gas limit `2^64−1`, base fee ≈ 37 160 wei; estimates are 7.1 × 10¹⁵ (MockRWA) and
   1.5 × 10¹⁶ (RWAVault). `eth_estimateGas` ignores the sender's balance, and no indexed EVM transaction was found in the
   last ~400 blocks, so the **real deployment fee is unknown until the first deploy**.
+- **Participant announcements:** 2026-10-02 (DoraHacks) — the testnet wallet field now requires an SS58 address starting
+  with `5`; earlier entries (0x… or `1…` addresses) were **cleared** and must be resubmitted in the DoraHacks project
+  dashboard. Wallet: https://www.portaldot.world. 2026-10-19 — first token batch distributed, another batch later.
+- **Hackathon listing** ([DoraHacks](https://dorahacks.io/hackathon/portaldot-hacker-house-2026),
+  [hacklist](https://hacklist.io/hackathon/39d07d07-37ce-4948-b27d-6deac1312bd9)): projects **must deploy on the Portaldot
+  testnet**; submission needs a repo link and a demo video. Tracks: Modular Cloud and Middleware (middleware,
+  storage/data components, APIs) · Multi-Chain and Cross-Chain Infra (bridges, liquidity) · Node Operations and Tooling
+  (monitoring, staking automation, node data, security analysis) · Ecosystem DApps (DeFi, **RWA tokenization**, consumer
+  apps; also 2nd/3rd place prizes). Judging criteria not published.
 - No EVM explorer and no faucet announced → `explorer` / `faucetUrl` stay `TODO`; no EVM WebSocket announced → `wsUrl` `TODO`.
 
 ## Check of 2026-10-13
@@ -106,7 +115,7 @@ Verified directly (read-only RPC):
 | 5 | Precompiles for EVM → WASM/native calls | ⏳ open | — | dual-VM features |
 | 6 | Public testnet + faucet? node binary OSes? | ✅ testnet | Public testnet since 2026-10-20; no faucet: the team sends tPOT to participants' native addresses. | faucet panel, M1 |
 | 7 | Block explorer / Blockscout for EVM; verification | 🟡 | Only the Substrate node explorer (node-console.portaldot.dev); no EVM explorer/verification announced. | `networks.json` `explorer` |
-| 8 | Judging rules, submission requirements, best track | ⏳ open | Not published yet; ask organizers on Discord. | M4 |
+| 8 | Judging rules, submission requirements, best track | 🟡 | Must deploy on testnet; repo link + demo video. Judging criteria not published. | M4 |
 
 ## SS58 prefix (for `@portalkit/address`)
 
