@@ -112,7 +112,9 @@ export interface NativeAccountInfo {
   sufficients: number;
   free: bigint;
   reserved: bigint;
+  /** V2 (spec 1002). On the V3 testnet this slot is `frozen`. */
   miscFrozen: bigint;
+  /** V2 (spec 1002). On the V3 testnet this slot is `flags` (bit 127 set), not a balance; ignore it there. */
   feeFrozen: bigint;
 }
 
@@ -171,6 +173,10 @@ export interface ChainProperties {
   tokenSymbol?: string;
 }
 
+/** Runtime API ids = blake2_64(name): "ReviveApi" (pallet-revive, EVM) and "ContractsApi" (pallet-contracts, WASM). */
+export const REVIVE_API_ID = "0x8c403e5c4a9fd442";
+export const CONTRACTS_API_ID = "0x68b66ba122c93fa7";
+
 export interface NativeChainInfo {
   chain: string;
   nodeVersion: string;
@@ -178,9 +184,9 @@ export interface NativeChainInfo {
   specVersion: number;
   bestBlock: number;
   properties: ChainProperties;
-  /** Ethereum JSON-RPC (`eth_*`) exposed by this node — i.e. EVM execution is available. */
+  /** EVM execution: pallet-revive runtime API (V3; Ethereum RPC is a separate eth-rpc service) or `eth_*` on the node. */
   evm: boolean;
-  /** WASM smart contracts (`contracts_*` RPC, pallet-contracts / ink!). */
+  /** WASM smart contracts (pallet-contracts / ink!): `ContractsApi` runtime API or `contracts_*` RPC. */
   wasmContracts: boolean;
   rpcMethodCount: number;
 }
@@ -190,12 +196,13 @@ export async function getNativeChainInfo(rpc: SubstrateRpc): Promise<NativeChain
   const [chain, nodeVersion, runtime, header, rawProps, methods] = await Promise.all([
     rpc.request<string>("system_chain"),
     rpc.request<string>("system_version"),
-    rpc.request<{ specName: string; specVersion: number }>("state_getRuntimeVersion"),
+    rpc.request<{ specName: string; specVersion: number; apis?: [string, number][] }>("state_getRuntimeVersion"),
     rpc.request<{ number: string }>("chain_getHeader"),
     rpc.request<Record<string, unknown>>("system_properties"),
     rpc.request<{ methods: string[] }>("rpc_methods"),
   ]);
   const first = (v: unknown) => (Array.isArray(v) ? v[0] : v);
+  const hasApi = (id: string) => (runtime.apis ?? []).some(([apiId]) => apiId === id);
   const properties: ChainProperties = {};
   const ss58 = first(rawProps.ss58Format);
   const decimals = first(rawProps.tokenDecimals);
@@ -210,8 +217,8 @@ export async function getNativeChainInfo(rpc: SubstrateRpc): Promise<NativeChain
     specVersion: runtime.specVersion,
     bestBlock: parseInt(header.number, 16),
     properties,
-    evm: methods.methods.some((m) => m.startsWith("eth_")),
-    wasmContracts: methods.methods.some((m) => m.startsWith("contracts_")),
+    evm: hasApi(REVIVE_API_ID) || methods.methods.some((m) => m.startsWith("eth_")),
+    wasmContracts: hasApi(CONTRACTS_API_ID) || methods.methods.some((m) => m.startsWith("contracts_")),
     rpcMethodCount: methods.methods.length,
   };
 }

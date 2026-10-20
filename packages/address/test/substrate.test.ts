@@ -128,6 +128,30 @@ describe("getNativeChainInfo", () => {
     expect(info.evm).toBe(true);
     expect(info.wasmContracts).toBe(false);
   });
+
+  it("detects revive + contracts from runtime APIs (V3 testnet: eth-rpc is a separate service)", async () => {
+    const info = await getNativeChainInfo(
+      fakeRpc({
+        system_chain: "PortaldotV3 Test",
+        system_version: "3.0.0-dev",
+        // ids from the V3 testnet's state_getRuntimeVersion (2026-10-20)
+        state_getRuntimeVersion: {
+          specName: "portaldot-v3",
+          specVersion: 3002,
+          apis: [
+            ["0xdf6acb689907609b", 5],
+            ["0x8c403e5c4a9fd442", 2],
+            ["0x68b66ba122c93fa7", 2],
+          ],
+        },
+        chain_getHeader: { number: "0x1cfb6" },
+        system_properties: { ss58Format: 42, tokenDecimals: 14, tokenSymbol: "tPOT" },
+        rpc_methods: { methods: ["system_chain", "state_call"] },
+      }),
+    );
+    expect(info.evm).toBe(true);
+    expect(info.wasmContracts).toBe(true);
+  });
 });
 
 describe("connectSubstrate (mock WebSocket)", () => {

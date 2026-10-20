@@ -2,6 +2,7 @@ import { spawn, spawnSync, type ChildProcess } from "node:child_process";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { custom, numberToHex } from "viem";
 import { parseNetworksConfig } from "@portalkit/chains";
+import rawNetworks from "../../../config/networks.json";
 import { runDoctor, type DoctorReport } from "../src/index.js";
 
 // Public Anvil dev account #0 — local testing only.
@@ -54,7 +55,8 @@ describe("runDoctor (mocked RPC)", () => {
   });
 
   it("fails on a pending (TODO) network without touching the RPC", async () => {
-    const report = await runDoctor({ ...base, network: "portaldot-v3", transport: fakeRpc() });
+    const config = parseNetworksConfig({ pending: { ...rawNetworks["portaldot-v3"], rpcUrl: "TODO" } });
+    const report = await runDoctor({ ...base, network: "pending", config, transport: fakeRpc() });
     expect(report.ok).toBe(false);
     expect(report.checks).toHaveLength(1);
     expect(report.checks[0]?.detail).toMatch(/rpcUrl still TODO/);

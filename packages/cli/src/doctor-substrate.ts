@@ -13,7 +13,7 @@ import type { CheckResult, DoctorOptions, DoctorReport } from "./doctor.js";
 /**
  * Checks for Portaldot's native (Substrate) side: node reachable, chain properties match the
  * config (SS58 prefix, POT decimals/symbol — wrong values silently produce wrong addresses and
- * amounts), runtime, which execution environments the node exposes (EVM `eth_*` / WASM
+ * amounts), runtime, which execution environments the node exposes (EVM via pallet-revive or `eth_*` / WASM
  * `contracts_*` — tells you when V3's EVM is live), and an optional SS58 account balance.
  */
 export async function runSubstrateDoctor(options: DoctorOptions): Promise<DoctorReport> {
@@ -58,8 +58,8 @@ export async function runSubstrateDoctor(options: DoctorOptions): Promise<Doctor
       title: "Execution environments",
       status: "pass",
       detail:
-        `EVM (eth_*): ${info.evm ? "available" : "not available"} · WASM contracts: ${info.wasmContracts ? "available" : "not available"}` +
-        (info.evm ? " — add a vm:\"evm\" network for its Ethereum RPC" : ""),
+        `EVM: ${info.evm ? "available" : "not available"} · WASM contracts: ${info.wasmContracts ? "available" : "not available"}` +
+        (info.evm ? " — check its Ethereum RPC with the matching vm:\"evm\" network" : ""),
     });
 
     // 6. Account balance

@@ -46,12 +46,12 @@ describe("runDoctor — substrate networks", () => {
       ["vms", "pass"],
       ["balance", "skip"],
     ]);
-    expect(status(report, "vms")?.detail).toBe("EVM (eth_*): not available · WASM contracts: available");
+    expect(status(report, "vms")?.detail).toBe("EVM: not available · WASM contracts: available");
   });
 
   it("detects when EVM becomes available", async () => {
     const report = await runDoctor({ ...base, substrateRpc: fakeNode({ rpc_methods: { methods: ["eth_chainId", "contracts_call"] } }) });
-    expect(status(report, "vms")?.detail).toMatch(/EVM \(eth_\*\): available/);
+    expect(status(report, "vms")?.detail).toMatch(/EVM: available/);
   });
 
   it("fails when the node's properties contradict the config", async () => {
