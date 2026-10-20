@@ -1,0 +1,7 @@
+# Run from the repo root: docker compose -f deploy/compose.yml up -d --build
+# Bound to localhost; nginx (deploy/nginx.conf) terminates TLS in front.
+services:
+  dashboard:
+    build: { context: .., dockerfile: deploy/Dockerfile, args: { PKG: "@portalkit/dashboard" } }
+    ports: ["127.0.0.1:3100:3000"]
+    restart: unless-stopped

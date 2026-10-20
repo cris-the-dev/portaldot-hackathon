@@ -3,7 +3,7 @@
 **Ship Solidity dApps on Portaldot V3 in minutes — and bridge its two worlds (EVM ↔ Substrate) from day one.**
 Plus **PortalVault**, a compliance-aware tokenized-RWA vault built entirely with the kit.
 
-> Portaldot Hacker House 2026 · Track: *Ecosystem DApps* or *Modular Cloud & Middleware* (to be confirmed against the official rules).
+> Portaldot Hacker House 2026 · Track: **Modular Cloud and Middleware**.
 > **Configured for the live Portaldot V3 testnet** (pallet-revive EVM, chainId 420420777, both its EVM RPC and its
 > Substrate node pass `portalkit doctor`), and everything is also tested **Anvil-first**. All values live in
 > [`config/networks.json`](config/networks.json). The native side also runs against live Portaldot mainnet.
