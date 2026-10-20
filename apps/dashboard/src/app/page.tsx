@@ -121,6 +121,16 @@ function FaucetCard() {
         </a>
       )}
       {faucetUrl === TODO && <Notice tone="warn">No official faucet announced for this network yet.</Notice>}
+      {faucetUrl === TODO && typeof findNetworkKey(chain.id)?.ss58Prefix === "number" && (
+        <p className="mt-2 text-sm text-muted">
+          Test tokens may be sent to native (SS58) accounts instead. Your EVM gas is paid from the SS58 account your 0x
+          address maps to: look it up on the{" "}
+          <Link className="text-accent" href="/address">
+            Address
+          </Link>{" "}
+          page and send native tokens there.
+        </p>
+      )}
 
       {devNode && (
         <div className="flex flex-col gap-3 text-sm">
