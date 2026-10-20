@@ -27,7 +27,7 @@ runs = 4096
 line_length = 120
 
 # RPC endpoints mirror config/networks.json (single source of truth).
-# The Portaldot V3 endpoint is supplied via env until V3 details are public (see docs/v3-findings.md).
+# Portaldot V3 testnet EVM endpoint per the organizers' announcement (2026-10-20).
 [rpc_endpoints]
 anvil = "http://127.0.0.1:8545"
-portaldot_v3 = "${PORTALDOT_V3_RPC_URL}"
+portaldot_v3 = "https://test-evm-rpc-v3.portaldot.dev"

@@ -41,29 +41,33 @@ describe("bundled config/networks.json", () => {
     expect(chain.blockExplorers).toBeUndefined();
   });
 
-  it("keeps Portaldot V3 pending until its RPC is known", () => {
-    expect(() => getEvmChain("portaldot-v3", noEnv)).toThrow(NetworkNotConfiguredError);
+  it("builds Portaldot V3 from config, omitting optional TODOs", () => {
+    const v3 = rawNetworks["portaldot-v3"];
+    const chain = getEvmChain("portaldot-v3", noEnv);
+    expect(chain.id).toBe(v3.chainId);
+    expect(chain.rpcUrls.default.http).toEqual([v3.rpcUrl]);
+    expect(chain.rpcUrls.default.webSocket).toBeUndefined();
+    expect(chain.blockExplorers).toBeUndefined();
     const status = listNetworks(noEnv).find((n) => n.key === "portaldot-v3");
-    expect(status?.status).toBe("pending");
-    expect(status?.pending).toEqual(
-      expect.arrayContaining(["rpcUrl", "explorer", "faucetUrl"]),
-    );
+    expect(status?.status).toBe("ready");
+    expect(status?.pending).toEqual(expect.arrayContaining(["wsUrl", "explorer", "faucetUrl"]));
   });
 
   it("only returns ready EVM chains from getEvmChains", () => {
-    expect(getEvmChains(noEnv).map((c) => c.id)).toEqual([rawNetworks.anvil.chainId]);
+    expect(getEvmChains(noEnv).map((c) => c.id)).toEqual([rawNetworks.anvil.chainId, rawNetworks["portaldot-v3"].chainId]);
   });
 });
 
 describe("error reporting", () => {
   it("names every missing field for a pending network", () => {
+    const config = parseNetworksConfig({ x: { ...rawNetworks["portaldot-v3"], rpcUrl: "TODO" } });
     try {
-      getEvmChain("portaldot-v3", noEnv);
+      getEvmChain("x", { config, env: {} });
       expect.unreachable();
     } catch (err) {
       expect(err).toBeInstanceOf(NetworkNotConfiguredError);
       expect((err as NetworkNotConfiguredError).missing).toEqual(["rpcUrl"]);
-      expect((err as Error).message).toContain(rpcUrlEnvVar("portaldot-v3"));
+      expect((err as Error).message).toContain(rpcUrlEnvVar("x"));
     }
   });
 

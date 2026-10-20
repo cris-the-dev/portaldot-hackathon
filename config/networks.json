@@ -15,16 +15,25 @@
     "vm": "evm",
     "name": "Portaldot V3 Testnet",
     "chainId": 420420777,
-    "rpcUrl": "TODO",
+    "rpcUrl": "https://test-evm-rpc-v3.portaldot.dev",
     "wsUrl": "TODO",
     "nativeName": "Portaldot",
-    "nativeSymbol": "tPOTv3",
-    "nativeDecimals": 14,
+    "nativeSymbol": "tPOT",
+    "nativeDecimals": 18,
     "explorer": "TODO",
     "faucetUrl": "TODO",
     "ss58Prefix": 42,
     "testnet": true,
-    "notes": "From the V3 testnet guide (github.com/ItsCogumellum/portaldot-v3-testnet-guide, 2026-10-02): chainId 420420777, tPOTv3, 14 decimals, EVM via pallet-revive; ss58 42 from its mapped-address example. RPC TODO: the published endpoints were withdrawn on 2026-10-09 (testnet upgrade) — set PORTALKIT_RPC_URL_PORTALDOT_V3 or fill rpcUrl once new ones are announced. Testnet chainId is not final for mainnet. See docs/v3-findings.md."
+    "notes": "Endpoints from the organizers' Discord announcement (2026-10-20). EVM via pallet-revive eth-rpc; the EVM side reports balances with 18 decimals (native tPOT has 14), verified 2026-10-20 by comparing eth_getBalance with the mapped account's free balance. No EVM block explorer (Substrate node explorer: https://node-console.portaldot.dev/); no faucet: tokens are distributed to participants' native (5…) addresses. Testnet chainId is not final for mainnet. See docs/v3-findings.md."
+  },
+  "portaldot-v3-native": {
+    "vm": "substrate",
+    "name": "Portaldot V3 Testnet (native)",
+    "wsUrl": "wss://test-node-v3.portaldot.dev",
+    "nativeSymbol": "tPOT",
+    "nativeDecimals": 14,
+    "ss58Prefix": 42,
+    "notes": "Substrate side of the V3 testnet. system_properties verified 2026-10-20: ss58Format 42, tokenDecimals 14, tokenSymbol tPOT."
   },
   "portaldot-v2": {
     "vm": "substrate",
