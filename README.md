@@ -165,4 +165,4 @@ _TBD — names and roles._
 
 ## License
 
-_TBD_ — the packages currently declare MIT in `package.json`; add a `LICENSE` file once decided.
+[MIT](LICENSE).
