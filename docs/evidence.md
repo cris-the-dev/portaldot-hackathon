@@ -5,12 +5,13 @@ Record every deployment and demo transaction on Portaldot here (M1 / M4). Addres
 
 ## Portaldot V3 (EVM)
 
-_Pending — testnet live since 2026-10-20; waiting for a funded deployer. Dry-runs (`eth_estimateGas`) of both solc-built
-contracts succeed (see [`v3-findings.md`](v3-findings.md))._
+Deployer `0x55Ae2683ECBa375e737D926e38926430A4dA7d1D` (gas account `5E13fHMRzQL6FLyguBN9CZiU9EPyQMy349WLCv7fq9qVj6My`,
+funded from a native `5…` wallet). RWAVault is pending more tPOT (~560 tPOT storage deposit, see
+[`v3-findings.md`](v3-findings.md)). No EVM explorer yet; tx hashes can be checked with `cast receipt <hash> --rpc-url portaldot_v3`.
 
 | Date | Network (chainId) | Contract / action | Address | Tx hash | Explorer |
 |---|---|---|---|---|---|
-| | | MockRWA deploy | | | |
+| 2026-10-22 | Portaldot V3 testnet (420420777) | MockRWA deploy (block 147802, fee 260.56 tPOT) | `0x1ac55f7161efa932aa6963e86fac92b74d45094d` | `0x95a99ede50a69c139ebdec972e867f665fef502cbb55428cae9f82fd90bf0d96` | — |
 | | | RWAVault deploy | | | |
 | | | Deposit / yield / withdraw demo | | | |
 
@@ -19,6 +20,12 @@ node packages/cli/dist/portalkit.js doctor -n portaldot-v3 --address <deployer 0
 # PRIVATE_KEY in contracts/.env (never committed)
 cd contracts && forge script script/Deploy.s.sol --rpc-url portaldot_v3 --broadcast
 ```
+
+## Portaldot V3 testnet (native transfers)
+
+| Date | Action | Tx hash |
+|---|---|---|
+| 2026-10-22 | 300 tPOT `5HWHon…6Byra` → `5E13fHMR…Vj6My` (deployer's mapped account; shows as 299.9 tPOT via `eth_getBalance`) | `0xc0c8e69d6cde82520f4738089a2b5c702689e6a20c565ba8d2d43af3ce251c16` (block `0x0b6398…d2e4`) |
 
 ## Portaldot V3 testnet (read-only checks)
 

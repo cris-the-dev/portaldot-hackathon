@@ -51,6 +51,9 @@ Verified directly (read-only RPC):
   `revive` constants: `depositPerByte` 0.06 tPOT, `codeHashLockupDepositPercent` 30 % (→ ~0.078 tPOT/byte),
   `depositPerItem` 0.15 tPOT, `nativeToEthRatio` 10⁴ (14 → 18 decimals), `autoMap` true, `allowEVMBytecode` true. So it
   is almost all a **refundable storage deposit**, not execution fee; optimizer `runs=1` only saves ~300 bytes (~25 tPOT).
+  **Confirmed by a real deploy (2026-10-22):** MockRWA cost **260.56 tPOT** (estimate 264.63, −1.5 %); `gasUsed` × `effectiveGasPrice`
+  equals the balance drop exactly. A legacy tx with `gasPrice` ≈ current price and `gasLimit` = estimate is accepted with
+  ~300 tPOT, and a native transfer to `H160 ++ 0xEE×12` shows up in `eth_getBalance` (the `revive` mapping holds).
 - **Participant announcements:** 2026-10-02 (DoraHacks) — the testnet wallet field now requires an SS58 address starting
   with `5`; earlier entries (0x… or `1…` addresses) were **cleared** and must be resubmitted in the DoraHacks project
   dashboard. Wallet: https://www.portaldot.world. 2026-10-19 — first token batch distributed, another batch later.
