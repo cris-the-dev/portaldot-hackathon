@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import { useMemo, useState, type ChangeEvent } from "react";
-import { getAddress, type Abi, type Hash } from "viem";
+import { encodeDeployData, formatUnits, getAddress, type Abi, type Hash } from "viem";
 
 type AbiConstructor = Extract<Abi[number], { type: "constructor" }>;
-import { useConnection, useDeployContract, useWaitForTransactionReceipt } from "wagmi";
+import { useConnection, useDeployContract, usePublicClient, useWaitForTransactionReceipt } from "wagmi";
 import { FunctionForm } from "@/components/function-form";
 import { Card, Label, Mono, Notice, Textarea } from "@/components/ui";
 import { ArtifactError, parseArtifact, parseBytecode, type ParsedArtifact } from "@/lib/artifact";
@@ -14,7 +14,7 @@ import { rememberAbi } from "@/lib/session";
 
 export default function DeployPage() {
   const mounted = useMounted();
-  const { isConnected } = useConnection();
+  const { isConnected, address } = useConnection();
   const { chain, wrongNetwork } = useActiveChain();
   const [artifactText, setArtifactText] = useState("");
   const [bytecodeText, setBytecodeText] = useState("");
@@ -22,6 +22,10 @@ export default function DeployPage() {
   const [hash, setHash] = useState<Hash | undefined>();
   const [sendError, setSendError] = useState<string | null>(null);
 
+  const [estimate, setEstimate] = useState<{ gas: bigint; gasPrice: bigint; balance: bigint } | null>(null);
+  const [estimating, setEstimating] = useState(false);
+
+  const publicClient = usePublicClient({ chainId: chain.id });
   const deploy = useDeployContract();
   const receipt = useWaitForTransactionReceipt({ hash, chainId: chain.id });
 
@@ -106,12 +110,31 @@ export default function DeployPage() {
               inputs={ctor?.inputs ?? []}
               payable={ctor?.stateMutability === "payable"}
               submitLabel={`Deploy to ${chain.name}`}
-              busy={deploy.isPending || (Boolean(hash) && receipt.isLoading)}
+              busy={estimating || deploy.isPending || (Boolean(hash) && receipt.isLoading)}
               disabled={!mounted || !isConnected || wrongNetwork || !bytecode.value}
-              onSubmit={(args, value) => {
-                if (!parsed.artifact || !bytecode.value) return;
+              onSubmit={async (args, value) => {
+                if (!parsed.artifact || !bytecode.value || !publicClient || !address) return;
                 setSendError(null);
                 setHash(undefined);
+                setEstimate(null);
+                // Estimate first: on Portaldot V3 (pallet-revive) creation cost is dominated by a storage deposit,
+                // so wallets often fail with an opaque "insufficient funds" — show the real number instead.
+                setEstimating(true);
+                try {
+                  const data = encodeDeployData({ abi: parsed.artifact.abi, bytecode: bytecode.value, args });
+                  const [gas, gasPrice, balance] = await Promise.all([
+                    publicClient.estimateGas({ account: address, data, value }),
+                    publicClient.getGasPrice(),
+                    publicClient.getBalance({ address }),
+                  ]);
+                  setEstimate({ gas, gasPrice, balance });
+                  if (gas * gasPrice + (value ?? 0n) > balance) return;
+                } catch (err) {
+                  setSendError(`Gas estimation failed: ${errorMessage(err)}`);
+                  return;
+                } finally {
+                  setEstimating(false);
+                }
                 deploy.mutate(
                   { abi: parsed.artifact.abi, bytecode: bytecode.value, args, value, chainId: chain.id },
                   { onSuccess: setHash, onError: (err) => setSendError(errorMessage(err)) },
@@ -123,7 +146,8 @@ export default function DeployPage() {
       </div>
 
       <Card title="Result" className="h-fit">
-        {!hash && !sendError && <p className="text-sm text-muted">The transaction and contract address show up here.</p>}
+        {!hash && !sendError && !estimate && <p className="text-sm text-muted">The transaction and contract address show up here.</p>}
+        {estimate && <CostEstimate {...estimate} symbol={chain.nativeCurrency.symbol} decimals={chain.nativeCurrency.decimals} />}
         {sendError && <Notice tone="err">{sendError}</Notice>}
         {hash && (
           <dl className="flex flex-col gap-3 text-sm">
@@ -170,5 +194,33 @@ export default function DeployPage() {
         )}
       </Card>
     </div>
+  );
+}
+
+function CostEstimate({ gas, gasPrice, balance, symbol, decimals }: { gas: bigint; gasPrice: bigint; balance: bigint; symbol: string; decimals: number }) {
+  const cost = gas * gasPrice;
+  const fmt = (v: bigint) => `${Number(formatUnits(v, decimals)).toLocaleString(undefined, { maximumFractionDigits: 4 })} ${symbol}`;
+  return (
+    <dl className="mb-3 flex flex-col gap-1 text-sm">
+      <dt className="text-xs text-muted">Estimated cost (upper bound)</dt>
+      <dd>
+        <b className="tabular-nums">{fmt(cost)}</b>
+        <span className="ml-2 text-xs text-muted">
+          {gas.toLocaleString()} gas × {gasPrice.toLocaleString()} wei · balance {fmt(balance)}
+        </span>
+      </dd>
+      {cost > balance && (
+        <dd>
+          <Notice tone="err">
+            Not enough {symbol}: short by {fmt(cost - balance)}. On Portaldot, fund this account from a native wallet on
+            the{" "}
+            <Link href="/address" className="underline">
+              Address page
+            </Link>
+            .
+          </Notice>
+        </dd>
+      )}
+    </dl>
   );
 }
