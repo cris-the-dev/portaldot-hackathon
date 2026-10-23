@@ -12,6 +12,7 @@ funded from a native `5…` wallet). RWAVault is pending more tPOT (~560 tPOT st
 | Date | Network (chainId) | Contract / action | Address | Tx hash | Explorer |
 |---|---|---|---|---|---|
 | 2026-10-22 | Portaldot V3 testnet (420420777) | MockRWA deploy (block 147802, fee 260.56 tPOT) | `0x1ac55f7161efa932aa6963e86fac92b74d45094d` | `0x95a99ede50a69c139ebdec972e867f665fef502cbb55428cae9f82fd90bf0d96` | — |
+| 2026-10-23 | Portaldot V3 testnet (420420777) | MockRWA `mint` 1,000 tGOLD → deployer (block 156732, fee 7.70 tPOT) | `0x1ac55f7161efa932aa6963e86fac92b74d45094d` | `0x9150a227c5e151f6bdf2cb32b424a05db9e67d275566e4a44453197602db3280` | — |
 | | | RWAVault deploy | | | |
 | | | Deposit / yield / withdraw demo | | | |
 
@@ -33,6 +34,7 @@ cd contracts && forge script script/Deploy.s.sol --rpc-url portaldot_v3 --broadc
 |---|---|---|
 | 2026-10-20 | `portalkit doctor -n portaldot-v3 --address 0xd9838a86cf83c28ee486544060d1ca4ca2971071` | ✅ chainId 420420777 · 9/9 required `eth_*` · EIP-1559 · balance 182.99 tPOT |
 | 2026-10-20 | `portalkit doctor -n portaldot-v3-native --address 5GyuKkF3Hpv6aRwFa5BtcWvXLqGDjGfMLi1f2jFraJ4Zuef5` | ✅ ss58 42 · 14 decimals · tPOT · runtime `portaldot-v3` 3002 · EVM available · WASM contracts available |
+| 2026-10-23 | `portalkit doctor -n portaldot-v3 --address 0x55Ae…7d1D` | ✅ all required checks · block #156735 in 817 ms (earlier `eth_getBlockByNumber` timeout was transient) |
 | 2026-10-20 | `eth_estimateGas` create of solc-built MockRWA / RWAVault | ✅ accepted (7.1e15 / 1.5e16 gas) |
 
 ## Portaldot mainnet (native, read-only checks)
