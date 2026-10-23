@@ -15,7 +15,8 @@ hard-coding it.
 - **Dashboard** — add Portaldot to MetaMask, deploy any contract from ABI + bytecode with auto-generated constructor
   forms, call any contract in the ABI playground with decoded events.
 - **Dual-VM address converter** — maps an EVM `0x` address to the SS58 account that pays its gas, and shows live
-  native balances, so testnet tokens sent to a `5…` address can be moved to where MetaMask spends them.
+  native balances, and **funds it in one click**: sign a native transfer with the Portaldot Extension and testnet
+  tokens sent to a `5…` address land where MetaMask spends them.
 - **PortalVault** — showcase built with the kit: a tokenized-gold ERC-20 and a compliance-aware (KYC) ERC-4626 vault
   with issuer-distributed yield.
 

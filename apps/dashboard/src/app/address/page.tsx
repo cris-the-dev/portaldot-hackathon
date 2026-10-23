@@ -13,6 +13,7 @@ import {
 import { TODO, getNetwork } from "@portalkit/chains";
 import { useMemo, useState } from "react";
 import { getAddress } from "viem";
+import { FundEvmCard } from "@/components/fund";
 import { NativeAccountCard } from "@/components/native";
 import { Badge, Card, Input, Label, Mono, Notice } from "@/components/ui";
 import { networkStatuses } from "@/lib/wagmi";
@@ -144,13 +145,20 @@ export default function AddressPage() {
         {mapping?.ok && kind === "evm" && strategyId === REVIVE_STRATEGY_ID && (
           <Notice>
             On Portaldot V3, gas for this EVM account is paid from the Substrate account above: send native tokens
-            there (e.g. from the node explorer) and they show up in MetaMask.
+            there (below, with the Portaldot Extension) and they show up in MetaMask.
           </Notice>
         )}
         {mapping?.pending && <Notice tone="warn">{mapping.pending}</Notice>}
         {mapping?.err && <Notice tone="err">{mapping.err}</Notice>}
         {!mapping && <p className="text-sm text-muted">Enter an address to map it across VMs.</p>}
       </Card>
+
+      {mapping?.ok && kind === "evm" && strategyId === REVIVE_STRATEGY_ID && (
+        <>
+          <NativeAccountCard ss58={mapping.ok} />
+          <FundEvmCard ss58={mapping.ok} />
+        </>
+      )}
     </div>
   );
 }
