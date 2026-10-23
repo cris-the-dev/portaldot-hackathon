@@ -166,6 +166,8 @@ async function useHardhatScripts(dir: string): Promise<void> {
   pkg.scripts["contracts:build"] = "pnpm -C contracts build";
   pkg.scripts["contracts:test"] = "pnpm -C contracts test";
   pkg.scripts["deploy:anvil"] = "pnpm -C contracts deploy:anvil";
+  // Foundry-only until a Hardhat deploy is verified on Portaldot V3.
+  delete pkg.scripts["deploy:portaldot"];
   await writeFile(file, `${JSON.stringify(pkg, null, 2)}\n`);
   const ws = path.join(dir, "pnpm-workspace.yaml");
   const yaml = (await readFile(ws, "utf8")).replace('  - "web"\n', '  - "contracts"\n  - "web"\n');

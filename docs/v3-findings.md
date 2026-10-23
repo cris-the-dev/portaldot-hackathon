@@ -54,6 +54,14 @@ Verified directly (read-only RPC):
   **Confirmed by a real deploy (2026-10-22):** MockRWA cost **260.56 tPOT** (estimate 264.63, −1.5 %); `gasUsed` × `effectiveGasPrice`
   equals the balance drop exactly. A legacy tx with `gasPrice` ≈ current price and `gasLimit` = estimate is accepted with
   ~300 tPOT, and a native transfer to `H160 ++ 0xEE×12` shows up in `eth_getBalance` (the `revive` mapping holds).
+- **`forge script` needs `--skip-simulation` (2026-10-23):** without it Forge sets the gas limit from its local
+  simulation (248 k for Counter) and the node rejects the tx (`1010: Invalid Transaction`, then `1012: temporarily
+  banned` on retries; nothing is charged). With `--skip-simulation --legacy` Forge uses `eth_estimateGas` and the
+  scaffolded Counter deployed for 62.95 tPOT (638 B code, matches the 13 + 0.078/byte rule). The template's
+  `pnpm deploy:portaldot` bakes this in. Caveat: the deploy script writes `deployments/<chainId>.json` before broadcasting,
+  so a rejected broadcast still leaves an address there.
+- **Substrate extensions sign V3 transfers:** a polkadot-js style signer (`signPayload`) works with `@polkadot/api` 17
+  against runtime 3002, whose custom signed extensions `AuthorizeCall` / `EthSetOrigin` carry no payload.
 - **Participant announcements:** 2026-10-02 (DoraHacks) — the testnet wallet field now requires an SS58 address starting
   with `5`; earlier entries (0x… or `1…` addresses) were **cleared** and must be resubmitted in the DoraHacks project
   dashboard. Wallet: https://www.portaldot.world. 2026-10-19 — first token batch distributed, another batch later.

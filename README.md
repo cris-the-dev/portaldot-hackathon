@@ -78,6 +78,8 @@ $ portalkit doctor -n portaldot-mainnet --address 5GHBWSmwFuzown3aG1edDEGN6tD1qq
 | ![ABI playground](docs/images/dashboard-playground.png) | ![Deploy wizard](docs/images/dashboard-deploy.png) |
 | **PortalVault — yield raised the share price to 1.1** | **PortalVault — unverified investor (KYC)** |
 | ![PortalVault](docs/images/vault.png) | ![KYC gating](docs/images/vault-kyc.png) |
+| **Dashboard — fund an EVM account from a native wallet (real V3 transfer)** | |
+| ![Fund EVM account](docs/images/fund-evm-account-v3.png) | |
 
 ## Quickstart
 

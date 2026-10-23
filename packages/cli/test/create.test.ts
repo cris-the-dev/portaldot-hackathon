@@ -98,6 +98,7 @@ describe("createProject", () => {
     const pkg = JSON.parse(await readFile(path.join(dir, "package.json"), "utf8"));
     expect(pkg.scripts["contracts:test"]).toBe("pnpm -C contracts test");
     expect(pkg.scripts["deploy:anvil"]).toBe("pnpm -C contracts deploy:anvil");
+    expect(pkg.scripts["deploy:portaldot"]).toBeUndefined();
     const contracts = JSON.parse(await readFile(path.join(dir, "contracts/package.json"), "utf8"));
     expect(contracts.name).toBe("hh-contracts");
     expect(contracts.devDependencies["@portalkit/chains"]).toBe("^0.1.0");
