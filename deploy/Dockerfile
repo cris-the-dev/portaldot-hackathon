@@ -4,7 +4,8 @@ RUN corepack enable
 WORKDIR /app
 COPY . .
 ARG PKG=@portalkit/dashboard
-ENV PKG=${PKG} NEXT_TELEMETRY_DISABLED=1
+ARG BASE_PATH=
+ENV PKG=${PKG} BASE_PATH=${BASE_PATH} NEXT_TELEMETRY_DISABLED=1
 RUN pnpm install --frozen-lockfile && pnpm turbo run build --filter="${PKG}..."
 EXPOSE 3000
 CMD pnpm -F "$PKG" exec next start --port 3000

@@ -3,7 +3,8 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "inputs": ["$TURBO_DEFAULT$", "../../config/networks.json"],
+      "inputs": ["$TURBO_DEFAULT$", "../../config/networks.json", "../../config/deployments/**"],
+      "env": ["BASE_PATH"],
       "outputs": ["dist/**", ".next/**", "!.next/cache/**"]
     },
     "lint": {},

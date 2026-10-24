@@ -5,3 +5,7 @@ services:
     build: { context: .., dockerfile: deploy/Dockerfile, args: { PKG: "@portalkit/dashboard" } }
     ports: ["127.0.0.1:3100:3000"]
     restart: unless-stopped
+  vault:
+    build: { context: .., dockerfile: deploy/Dockerfile, args: { PKG: "@portalkit/vault-app", BASE_PATH: /vault } }
+    ports: ["127.0.0.1:3101:3000"]
+    restart: unless-stopped
