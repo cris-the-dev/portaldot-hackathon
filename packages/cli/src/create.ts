@@ -128,7 +128,7 @@ export async function createProject(options: CreateOptions): Promise<CreateResul
 }
 
 /** Local PortalKit packages that generated projects depend on (directly or transitively). */
-const LOCAL_PACKAGES = ["chains", "templates", "cli"] as const;
+const LOCAL_PACKAGES = ["address", "chains", "templates", "cli"] as const;
 
 /**
  * Local mode: `pnpm pack` each package (this rewrites `workspace:*` like a real publish) into
