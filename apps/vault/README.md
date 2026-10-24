@@ -18,7 +18,7 @@ role gets a panel to verify/revoke investors and toggle the requirement.
 ```bash
 anvil
 cd contracts && PRIVATE_KEY=<anvil key #0> forge script script/Deploy.s.sol --rpc-url anvil --broadcast
-pnpm -F @portalkit/vault-app dev          # http://localhost:3001 — connect with anvil account #0 (issuer)
+pnpm -F @portalkit/vault-app dev          # http://localhost:3001, connect with anvil account #0 (issuer)
 ```
 
 `pnpm -F @portalkit/vault-app e2e`: browser smoke test (mint → deposit → yield → +10% share price → withdraw → history → verify/revoke investor → unverified view),

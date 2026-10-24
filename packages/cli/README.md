@@ -27,8 +27,8 @@ For `vm: "substrate"` entries (e.g. `portaldot-mainnet`, `portaldot-v2`) doctor 
 |---|---|
 | Node reachable | WebSocket RPC down |
 | Chain properties match config | node's `ss58Format` / `tokenDecimals` / `tokenSymbol` differ from config (TODO fields → warning showing the node's values) |
-| Runtime | — (shows `specName` / `specVersion`) |
-| Execution environments | — shows whether the node exposes EVM (`eth_*`) and WASM contracts (`contracts_*`): tells you when V3's EVM is live |
+| Runtime | (shows `specName` / `specVersion`) |
+| Execution environments | Shows whether the node exposes EVM (`eth_*`) and WASM contracts (`contracts_*`): tells you when V3's EVM is live |
 | Account balance | `--address <SS58>` free POT < `--min-balance` |
 
 ```bash
@@ -51,7 +51,7 @@ Generates a pnpm project:
 
 ```
 my-app/
-  contracts/      Foundry (Counter, forge tests, forge script)  — or —
+  contracts/      Foundry (Counter, forge tests, forge script)  or
                   Hardhat 3 (Counter, node:test + viem tests, viem deploy script; networks from networks.json)
   web/            Next.js + wagmi + viem; chains from ../networks.json via @portalkit/chains
   networks.json   snapshot of PortalKit's network config (the project's own source of truth)
@@ -65,7 +65,7 @@ Both presets deploy with one command (`pnpm deploy:anvil`) and write the same `d
 
 Options: `--contracts foundry|hardhat`, `--no-git` (skip `git init` + `forge install`), `--no-install` (skip `pnpm install`),
 `--portalkit <path>` (development: `pnpm pack` the local PortalKit packages into `.portalkit/` and
-point dependencies/overrides at them — works before anything is published to npm).
+point dependencies/overrides at them; works before anything is published to npm).
 
 > The `@portalkit/*` packages are **not published to npm yet**, so for now use `--portalkit <path-to-this-repo>`
 > (after `pnpm build`).

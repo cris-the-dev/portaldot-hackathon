@@ -32,7 +32,7 @@ import { connectSubstrate, getNativeChainInfo, getNativeAccount } from "@portalk
 
 const rpc = await connectSubstrate("wss://mainnet.portaldot.io");
 await getNativeChainInfo(rpc);     // chain, runtime, properties, { evm, wasmContracts }
-await getNativeAccount(rpc, ss58); // { nonce, free, reserved, … } — AccountInfo layout verified on spec 1002
+await getNativeAccount(rpc, ss58); // { nonce, free, reserved, … }; AccountInfo layout verified on spec 1002
 rpc.close();
 ```
 

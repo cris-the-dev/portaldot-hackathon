@@ -12,7 +12,7 @@ Last checked: **2026-10-20**
 - `Portaldot/Cargo.toml` on `main` includes `frame/contracts` (WASM/ink!) but **no `pallet-evm` / Frontier** → V3 (EVM) code is not public yet.
 - Dev docs: https://portaldot-dev.readthedocs.io
 
-## Check of 2026-10-20 — testnet back
+## Check of 2026-10-20: testnet back
 
 Source: organizers' announcement on Discord, "PortaldotV3 Testnet: Updated Network Info & Testnet Token Distribution"
 (previous endpoints are no longer in use):
@@ -34,7 +34,7 @@ Verified directly (read-only RPC):
   itself has no `eth_*` RPC (eth-rpc is a separate service), so detection now uses the runtime APIs.
   `portalkit doctor -n portaldot-v3-native` passes.
 - **EVM decimals = 18** (not 14): for a funded account, `eth_getBalance` = 182.988467982237333700 × 10¹⁸ while the mapped
-  native account (`H160 ++ 0xEE×12`) holds 183.08846798223733 tPOT at 14 decimals — same digits, scaled ×10⁴, minus
+  native account (`H160 ++ 0xEE×12`) holds 183.08846798223733 tPOT at 14 decimals: same digits, scaled ×10⁴, minus
   0.1 tPOT (likely the existential deposit, which the EVM view excludes). This also confirms the `revive` mapping on live data.
 - **AccountInfo layout:** still 80 bytes, but the 4th u128 is `flags` (bit 127 set), not `feeFrozen` (newer
   `pallet-balances`). `decodeAccountInfo` keeps the V2 field names; nothing reads that slot.
@@ -62,9 +62,9 @@ Verified directly (read-only RPC):
   so a rejected broadcast still leaves an address there.
 - **Substrate extensions sign V3 transfers:** a polkadot-js style signer (`signPayload`) works with `@polkadot/api` 17
   against runtime 3002, whose custom signed extensions `AuthorizeCall` / `EthSetOrigin` carry no payload.
-- **Participant announcements:** 2026-10-02 (DoraHacks) — the testnet wallet field now requires an SS58 address starting
+- **Participant announcements:** 2026-10-02 (DoraHacks): the testnet wallet field now requires an SS58 address starting
   with `5`; earlier entries (0x… or `1…` addresses) were **cleared** and must be resubmitted in the DoraHacks project
-  dashboard. Wallet: https://www.portaldot.world. 2026-10-19 — first token batch distributed, another batch later.
+  dashboard. Wallet: https://www.portaldot.world. 2026-10-19: first token batch distributed, another batch later.
 - **Hackathon listing** ([DoraHacks](https://dorahacks.io/hackathon/portaldot-hacker-house-2026),
   [hacklist](https://hacklist.io/hackathon/39d07d07-37ce-4948-b27d-6deac1312bd9)): projects **must deploy on the Portaldot
   testnet**; submission needs a repo link and a demo video. Tracks: Modular Cloud and Middleware (middleware,
@@ -91,7 +91,7 @@ Verified directly (read-only RPC):
   hosts return NXDOMAIN → `rpcUrl`/`wsUrl` stay `TODO` (override with `PORTALKIT_RPC_URL_PORTALDOT_V3` when announced).
 - **Account mapping verified offline** from the guide's example `0xf7eC65d11e35375A250e474059a917B537804142` ↔
   `5Hfmuhj1AHrTBJiC9zUPnJo1cfG2G52LLMwofSigBnjtto8Y`: the SS58 decodes to
-  `f7ec65d11e35375a250e474059a917b537804142` + `ee`×12 — exactly pallet-revive's rule (AccountId32 = H160 ++ 0xEE×12), prefix 42.
+  `f7ec65d11e35375a250e474059a917b537804142` + `ee`×12, exactly pallet-revive's rule (AccountId32 = H160 ++ 0xEE×12), prefix 42.
   Implemented as the `revive` strategy in `@portalkit/address` with this vector. The reverse for *native* accounts
   (upstream: `keccak256(AccountId32)[12..]`) is not confirmed for Portaldot → the strategy refuses instead of guessing.
 - **Contracts compile for PolkaVM**: `forge flatten` + `resolc` 1.4.0 (`@parity/resolc`) builds `MockRWA` (35.9 KB) and
@@ -119,7 +119,7 @@ Verified directly (read-only RPC):
   `type_registry_preset="legacy"`; `contracts_call` accepts only five fields.
 - **Submission rules:** not published yet. A search result claiming "deploying to the Portaldot testnet is a submission requirement"
   comes from a post about a different event (Hacker House Goa) and is **not** treated as a Portaldot rule.
-- **Other teams:** e.g. *Potdo* — AI copilot turning plain English into native Substrate transactions
+- **Other teams:** e.g. *Potdo*: AI copilot turning plain English into native Substrate transactions
   ([repo](https://github.com/edycutjong/portaldot-hackathon-2026-potdo-edycu)). Native/Substrate side, no EVM → no overlap with PortalKit.
 
 ## Open questions (§5)
@@ -140,7 +140,7 @@ Verified directly (read-only RPC):
 - **`ss58-registry.json`** (repo root, identical on `main` and `master`) is an unmodified upstream
   Substrate registry: 59 entries (`0:polkadot` … `10041:basilisk`), **no Portaldot / POT entry**.
   It cannot be used to determine Portaldot's prefix.
-- **V2 runtime source** — `bin/node/runtime/src/lib.rs`: `spec_name: "portaldot"`,
+- **V2 runtime source**: `bin/node/runtime/src/lib.rs`: `spec_name: "portaldot"`,
   `spec_version: 1001`, `pub const SS58Prefix: u16 = 42;` (L189). 42 = generic `substrate` prefix.
   Recorded as `portaldot-v2.ss58Prefix = 42` in `config/networks.json`.
 - ✅ **Verified on the live chain (2026-10-02):** mainnet `system_properties.ss58Format = 42` (runtime 1002).

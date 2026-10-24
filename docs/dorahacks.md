@@ -5,20 +5,20 @@ tokens go to a `5…` address, and how to deploy without learning Rust.
 
 ## How it works
 PortalKit wraps Portaldot V3 in the tools EVM developers already use. One config file (`config/networks.json`) drives
-every tool — CLI, wallet setup, Foundry/Hardhat presets, dashboard — so the kit follows the network instead of
+every tool (CLI, wallet setup, Foundry/Hardhat presets, dashboard), so the kit follows the network instead of
 hard-coding it.
 
 ## Key features
-- **`create-portalkit-app`** — scaffolds a Foundry *or* Hardhat + Next.js (wagmi/viem) dApp, deployable in one command.
-- **`portalkit doctor`** — checks RPC, chainId, the `eth_*` API, runtime/VM availability and deployer balance on both
+- **`create-portalkit-app`**: scaffolds a Foundry *or* Hardhat + Next.js (wagmi/viem) dApp, deployable in one command.
+- **`portalkit doctor`**: checks RPC, chainId, the `eth_*` API, runtime/VM availability and deployer balance on both
   the EVM and the Substrate side.
-- **Dashboard** — add Portaldot to MetaMask, deploy any contract from ABI + bytecode with auto-generated constructor
-  forms and a pre-flight cost check (gas × price vs balance — on V3 most of a deploy is a storage deposit), call any
+- **Dashboard**: add Portaldot to MetaMask, deploy any contract from ABI + bytecode with auto-generated constructor
+  forms and a pre-flight cost check (gas × price vs balance; on V3 most of a deploy is a storage deposit), call any
   contract in the ABI playground with decoded events.
-- **Dual-VM address converter** — maps an EVM `0x` address to the SS58 account that pays its gas, and shows live
+- **Dual-VM address converter**: maps an EVM `0x` address to the SS58 account that pays its gas, and shows live
   native balances, and **funds it in one click**: sign a native transfer with the Portaldot Extension and testnet
   tokens sent to a `5…` address land where MetaMask spends them.
-- **PortalVault** — showcase built with the kit: a tokenized-gold ERC-20 and a compliance-aware (KYC) ERC-4626 vault
+- **PortalVault**: showcase built with the kit: a tokenized-gold ERC-20 and a compliance-aware (KYC) ERC-4626 vault
   with issuer-distributed yield.
 
 ## Tech stack

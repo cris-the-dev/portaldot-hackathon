@@ -1,6 +1,6 @@
 # @portalkit/chains
 
-viem/wagmi chain definitions for Portaldot, generated from [`config/networks.json`](../../config/networks.json) — the single source of truth. Nothing is hardcoded.
+viem/wagmi chain definitions for Portaldot, generated from [`config/networks.json`](../../config/networks.json), the single source of truth. Nothing is hardcoded.
 
 ```ts
 import { getEvmChain, getEvmChains, listNetworks } from "@portalkit/chains";

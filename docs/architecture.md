@@ -37,7 +37,7 @@ contracts/ ── MockRWA, RWAVault ── script/Deploy.s.sol ──► config/
 ```
 
 ### `@portalkit/chains`
-- `parseNetworksConfig(raw)` — zod schema, discriminated by `vm: "evm" | "substrate"`.
+- `parseNetworksConfig(raw)`: zod schema, discriminated by `vm: "evm" | "substrate"`.
 - `getEvmChain(key)`, `getEvmChains()`, `listNetworks()`, `getNetwork(key)`.
 - Env overrides `PORTALKIT_RPC_URL_<KEY>` / `PORTALKIT_WS_URL_<KEY>`; the browser passes `env: {}` so SSR and CSR agree.
 - The root JSON is inlined by tsup at build time, so the published package carries the same source of truth.
@@ -46,7 +46,7 @@ contracts/ ── MockRWA, RWAVault ── script/Deploy.s.sol ──► config/
 - SS58 via `@polkadot/util-crypto` (checksum verified, prefix extracted).
 - Native helpers use **raw JSON-RPC over WebSocket** (global `WebSocket`: browsers and Node ≥ 22) instead of `@polkadot/api`,
   because the V2 runtime (Substrate 3.0, spec 1002) is not fully decodable by current api versions.
-- `decodeAccountInfo` — 80 bytes: `nonce, consumers, providers, sufficients` (u32) + `free, reserved, miscFrozen, feeFrozen`
+- `decodeAccountInfo`: 80 bytes: `nonce, consumers, providers, sufficients` (u32) + `free, reserved, miscFrozen, feeFrozen`
   (u128). Verified on mainnet: nonce equals `system_accountNextIndex`, metadata contains `UpgradedToTripleRefCount`.
   Any other size throws instead of mis-decoding. The V3 testnet keeps 80 bytes; its 4th u128 is `flags`, not a balance.
 
@@ -59,7 +59,7 @@ contracts/ ── MockRWA, RWAVault ── script/Deploy.s.sol ──► config/
 - `create-portalkit-app` copies template sets, replaces `{{placeholders}}`, writes the networks snapshot, then optionally runs
   `git init`, `forge install forge-std` (Foundry) and `pnpm install`. Hardhat projects make `contracts/` a workspace package and
   pre-approve esbuild's build script (pnpm 11 blocks it otherwise). `--portalkit <path>` packs the local packages with
-  `pnpm pack` and points overrides at the tarballs — exactly what users would get from npm.
+  `pnpm pack` and points overrides at the tarballs, exactly what users would get from npm.
 
 ### Dashboard (`apps/dashboard`)
 Next.js 16 App Router, wagmi 3 + viem, Tailwind 4.
@@ -79,11 +79,11 @@ Next.js 16 App Router, wagmi 3 + viem, Tailwind 4.
   "withdraw 110" within 1e-6 of the max becomes redeem-all.
 
 ### Contracts
-- `MockRWA` — ERC-20 + AccessControl (`ISSUER_ROLE` mints), burnable.
-- `RWAVault` — ERC-4626 with `_decimalsOffset = 6` (inflation-attack resistance), `depositYield` (`YIELD_MANAGER_ROLE`),
+- `MockRWA`: ERC-20 + AccessControl (`ISSUER_ROLE` mints), burnable.
+- `RWAVault`: ERC-4626 with `_decimalsOffset = 6` (inflation-attack resistance), `depositYield` (`YIELD_MANAGER_ROLE`),
   simulated KYC (`COMPLIANCE_ROLE`): `maxDeposit`/`maxMint` return 0 for unverified receivers (ERC-4626-conformant), share
   transfers to unverified accounts revert, burns are never gated.
-- `Deploy.s.sol` — writes `config/deployments/<chainId>.json` on `--broadcast`; KYC on by default with the issuer verified.
+- `Deploy.s.sol`: writes `config/deployments/<chainId>.json` on `--broadcast`; KYC on by default with the issuer verified.
 
 ## Testing
 

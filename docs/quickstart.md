@@ -14,7 +14,7 @@ cd portalkit && git submodule update --init
 pnpm install && pnpm build
 ```
 
-## 1. Start a new dApp — `create-portalkit-app`
+## 1. Start a new dApp: `create-portalkit-app`
 
 ```bash
 cd ..
@@ -28,14 +28,14 @@ cd my-dapp
 
 ```bash
 anvil                                              # terminal 1
-cp .env.example .env                               # Anvil dev key #0 — local only
+cp .env.example .env                               # Anvil dev key #0, local only
 pnpm contracts:test
 set -a && . ./.env && set +a && pnpm deploy:anvil  # writes deployments/31337.json
 pnpm check                                         # portalkit doctor
 pnpm dev                                           # http://localhost:3000 → connect, Increment
 ```
 
-## 2. Check a network — `portalkit doctor`
+## 2. Check a network: `portalkit doctor`
 
 ```bash
 portalkit doctor                        # anvil: RPC, chainId, eth_* API, deployer balance
@@ -45,7 +45,7 @@ portalkit doctor --network portaldot-mainnet --address <SS58>
                                         # EVM/WASM availability, POT balance
 ```
 
-## 3. Deploy and call any contract — Dashboard
+## 3. Deploy and call any contract: Dashboard
 
 ```bash
 pnpm -F @portalkit/dashboard dev        # http://localhost:3000
@@ -59,7 +59,7 @@ pnpm -F @portalkit/dashboard dev        # http://localhost:3000
    native POT balance** on Portaldot mainnet; the H160↔SS58 mapping reports *pending-v3*.
 5. The home page's **V3 readiness** card reads mainnet live and shows whether EVM is available yet.
 
-## 4. Showcase — PortalVault (tokenized RWA, ERC-4626)
+## 4. Showcase: PortalVault (tokenized RWA, ERC-4626)
 
 ```bash
 anvil
@@ -71,7 +71,7 @@ pnpm -F @portalkit/vault-app dev        # http://localhost:3001, connect as Anvi
 Mint tGOLD (issuer tools) → deposit → *Distribute* yield → share price rises → withdraw → history.
 
 KYC is on by default (only the issuer is verified). To try another wallet, verify its address in the **Compliance** panel
-first — unverified wallets see deposits disabled (withdrawals are never blocked). Deploy with `KYC_REQUIRED=false` for an open vault.
+first; unverified wallets see deposits disabled (withdrawals are never blocked). Deploy with `KYC_REQUIRED=false` for an open vault.
 
 ## 5. Portaldot V3 testnet
 

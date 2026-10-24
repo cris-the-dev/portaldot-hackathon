@@ -15,3 +15,7 @@ contracts/broadcast/*/31337/
 contracts/broadcast/**/dry-run/
 demo-video/*/build/
 demo-video/frames/
+
+# local agent notes (not part of the project)
+CLAUDE.md
+AGENTS.md

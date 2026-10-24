@@ -1,11 +1,11 @@
 # PortalKit
 
-**Ship Solidity dApps on Portaldot V3 in minutes — and bridge its two worlds (EVM ↔ Substrate) from day one.**
+**Ship Solidity dApps on Portaldot V3 in minutes, and bridge its two worlds (EVM ↔ Substrate) from day one.**
 Plus **PortalVault**, a compliance-aware tokenized-RWA vault built entirely with the kit.
 
 > Portaldot Hacker House 2026 · Track: **Modular Cloud and Middleware**.
 > **Live dashboard: https://portalkit.cristhedev.com** · **Live PortalVault (V3 testnet): https://portalkit.cristhedev.com/vault**
-> **Demo video (2:44):** [`demo-video/portalkit-demo.mp4`](demo-video/portalkit-demo.mp4) — every transaction in it is real, on the Portaldot V3 testnet.
+> **Demo video (2:44):** [`demo-video/portalkit-demo.mp4`](demo-video/portalkit-demo.mp4). Every transaction in it is real, on the Portaldot V3 testnet.
 > **Configured for the live Portaldot V3 testnet** (pallet-revive EVM, chainId 420420777, both its EVM RPC and its
 > Substrate node pass `portalkit doctor`), and everything is also tested **Anvil-first**. All values live in
 > [`config/networks.json`](config/networks.json). The native side also runs against live Portaldot mainnet.
@@ -14,15 +14,15 @@ Plus **PortalVault**, a compliance-aware tokenized-RWA vault built entirely with
 
 ## The problem
 
-Portaldot V3 adds an EVM next to its Substrate runtime. That should bring in the largest developer pool in crypto — Solidity
-developers — but today they hit a wall:
+Portaldot V3 adds an EVM next to its Substrate runtime. That should bring in the largest developer pool in crypto (Solidity
+developers), but today they hit a wall:
 
 1. **No path in.** Which RPC? Which chainId? Where do I get POT for gas? These were the top complaints from the previous
    Portaldot hacker house. Every team rebuilds the same scaffolding (contracts + wallet + chain config) from scratch.
 2. **Two account worlds.** Portaldot users have SS58 accounts (`5Grw…`) with 14-decimal POT on the native side; EVM tools
    speak H160 (`0xf39F…`). Nothing shows a developer both sides at once.
 3. **Old, quirky native runtime.** The live chain runs a Substrate 3.0-era runtime (`portaldot` spec 1002) that current
-   `@polkadot/api` cannot fully decode — so even "what is this account's POT balance" needs custom work.
+   `@polkadot/api` cannot fully decode, so even "what is this account's POT balance" needs custom work.
 4. **Opaque failures.** A wrong chainId, a node without standard `eth_*` methods, or an unfunded deployer show up as cryptic
    transaction errors instead of a clear diagnosis.
 
@@ -34,7 +34,7 @@ developers — but today they hit a wall:
 | **`portalkit doctor`** | Pre-flight checks for a network. **EVM:** RPC alive, chainId matches config, the 9 `eth_*` methods tools rely on, deployer funded. **Native:** node reachable, SS58 prefix / POT decimals / symbol match config, runtime, **whether the node exposes EVM and WASM contracts**, SS58 account balance | Turns cryptic failures into a red line with a reason; **tells you the moment V3's EVM goes live** |
 | **`@portalkit/chains`** | viem/wagmi chain definitions generated from one config file; `TODO`-aware (pending networks are reported, never half-built) | Config-driven: filling in V3's values is the only change needed |
 | **`@portalkit/address`** | SS58 helpers, **pluggable H160 ↔ SS58 mapping strategies**, and raw-RPC helpers for Portaldot's native side (account decoder verified on mainnet) | The dual-VM foundation; V3's real mapping plugs in without touching callers |
-| **Dashboard** | Connect wallet + one-click *add network* · **deploy wizard** (Foundry/Hardhat artifact → auto-generated constructor form) · **ABI playground** (read/write any contract, decoded events) · **address converter** with the **live native POT balance** of any SS58 account · faucet panel · **V3 readiness** monitor | Everything a Solidity dev needs in a browser — no scripts |
+| **Dashboard** | Connect wallet + one-click *add network* · **deploy wizard** (Foundry/Hardhat artifact → auto-generated constructor form) · **ABI playground** (read/write any contract, decoded events) · **address converter** with the **live native POT balance** of any SS58 account · faucet panel · **V3 readiness** monitor | Everything a Solidity dev needs in a browser: no scripts |
 | **PortalVault** | `MockRWA` (tokenized gold) + `RWAVault` (ERC-4626): deposit, issuer-distributed yield, withdraw, history · **simulated KYC** (only verified investors hold shares; withdrawals never blocked) | Proves the kit end-to-end and hits Portaldot's tokenized-RWA narrative, compliance included |
 
 ### Live on Portaldot V3 testnet today
@@ -45,7 +45,7 @@ developers — but today they hit a wall:
 | `RWAVault` (PortalVault tGOLD, ERC-4626) | `0xe5378c971cf26453926b941dabf247cf1fd44697` |
 
 Deploys, mint, KYC, deposit / yield / withdraw, a scaffolded `Counter` deployed from the dashboard and native → EVM
-funding — **all tx hashes in [`docs/evidence.md`](docs/evidence.md)**.
+funding: **all tx hashes in [`docs/evidence.md`](docs/evidence.md)**.
 
 ```text
 $ portalkit doctor -n portaldot-v3 --address 0xd9838a86cf83c28ee486544060d1ca4ca2971071
@@ -81,14 +81,14 @@ $ portalkit doctor -n portaldot-mainnet --address 5GHBWSmwFuzown3aG1edDEGN6tD1qq
 
 ## Screenshots
 
-| Dashboard — V3 readiness (live mainnet) | Dashboard — native POT account + dual-VM converter |
+| Dashboard: V3 readiness (live mainnet) | Dashboard: native POT account + dual-VM converter |
 |---|---|
 | ![Dashboard home](docs/images/dashboard-home.png) | ![Address converter](docs/images/dashboard-address.png) |
-| **Dashboard — ABI playground (decoded events)** | **Dashboard — deploy wizard** |
+| **Dashboard: ABI playground (decoded events)** | **Dashboard: deploy wizard** |
 | ![ABI playground](docs/images/dashboard-playground.png) | ![Deploy wizard](docs/images/dashboard-deploy.png) |
-| **PortalVault — yield raised the share price to 1.1** | **PortalVault — unverified investor (KYC)** |
+| **PortalVault: yield raised the share price to 1.1** | **PortalVault: unverified investor (KYC)** |
 | ![PortalVault](docs/images/vault.png) | ![KYC gating](docs/images/vault-kyc.png) |
-| **Dashboard — fund an EVM account from a native wallet (real V3 transfer)** | |
+| **Dashboard: fund an EVM account from a native wallet (real V3 transfer)** | |
 | ![Fund EVM account](docs/images/fund-evm-account-v3.png) | |
 
 ## Quickstart
@@ -102,7 +102,7 @@ pnpm install && pnpm build
 
 anvil                                                   # terminal 1
 cd contracts && PRIVATE_KEY=0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80 \
-  forge script script/Deploy.s.sol --rpc-url anvil --broadcast   # Anvil dev key #0 — local only
+  forge script script/Deploy.s.sol --rpc-url anvil --broadcast   # Anvil dev key #0, local only
 cd .. && pnpm -F @portalkit/dashboard dev               # http://localhost:3000
 pnpm -F @portalkit/vault-app dev                        # http://localhost:3001
 
