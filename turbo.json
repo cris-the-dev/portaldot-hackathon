@@ -4,7 +4,7 @@
     "build": {
       "dependsOn": ["^build"],
       "inputs": ["$TURBO_DEFAULT$", "../../config/networks.json", "../../config/deployments/**"],
-      "env": ["BASE_PATH"],
+      "env": ["BASE_PATH", "NEXT_PUBLIC_DEFAULT_CHAIN_ID"],
       "outputs": ["dist/**", ".next/**", "!.next/cache/**"]
     },
     "lint": {},
