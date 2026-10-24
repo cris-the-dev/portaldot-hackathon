@@ -173,7 +173,7 @@ ink!/WASM templates next to Solidity ones, and a hosted dashboard for the commun
 
 ## Team
 
-_TBD — names and roles._
+**PortalX**
 
 ## License
 
