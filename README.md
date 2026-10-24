@@ -3,7 +3,9 @@
 **Ship Solidity dApps on Portaldot V3 in minutes — and bridge its two worlds (EVM ↔ Substrate) from day one.**
 Plus **PortalVault**, a compliance-aware tokenized-RWA vault built entirely with the kit.
 
-> Portaldot Hacker House 2026 · Track: **Modular Cloud and Middleware**. **Live dashboard: https://portalkit.cristhedev.com**
+> Portaldot Hacker House 2026 · Track: **Modular Cloud and Middleware**.
+> **Live dashboard: https://portalkit.cristhedev.com** · **Live PortalVault (V3 testnet): https://portalkit.cristhedev.com/vault**
+> **Demo video (2:44):** [`demo-video/portalkit-demo.mp4`](demo-video/portalkit-demo.mp4) — every transaction in it is real, on the Portaldot V3 testnet.
 > **Configured for the live Portaldot V3 testnet** (pallet-revive EVM, chainId 420420777, both its EVM RPC and its
 > Substrate node pass `portalkit doctor`), and everything is also tested **Anvil-first**. All values live in
 > [`config/networks.json`](config/networks.json). The native side also runs against live Portaldot mainnet.
@@ -36,6 +38,14 @@ developers — but today they hit a wall:
 | **PortalVault** | `MockRWA` (tokenized gold) + `RWAVault` (ERC-4626): deposit, issuer-distributed yield, withdraw, history · **simulated KYC** (only verified investors hold shares; withdrawals never blocked) | Proves the kit end-to-end and hits Portaldot's tokenized-RWA narrative, compliance included |
 
 ### Live on Portaldot V3 testnet today
+
+| Contract (V3 testnet, chainId 420420777) | Address |
+|---|---|
+| `MockRWA` (Tokenized Gold, tGOLD) | `0x1ac55f7161efa932aa6963e86fac92b74d45094d` |
+| `RWAVault` (PortalVault tGOLD, ERC-4626) | `0xe5378c971cf26453926b941dabf247cf1fd44697` |
+
+Deploys, mint, KYC, deposit / yield / withdraw, a scaffolded `Counter` deployed from the dashboard and native → EVM
+funding — **all tx hashes in [`docs/evidence.md`](docs/evidence.md)**.
 
 ```text
 $ portalkit doctor -n portaldot-v3 --address 0xd9838a86cf83c28ee486544060d1ca4ca2971071
@@ -151,12 +161,12 @@ browser E2E smoke tests for the dashboard and vault · CI on every push (lint, t
 | Native side on Portaldot mainnet (doctor, native account view, V3 readiness) | ✅ live |
 | V3 testnet in `networks.json` + `portalkit doctor` | ✅ EVM RPC + Substrate node verified live 2026-10-20 ([findings](docs/v3-findings.md)); explorer/faucet not announced |
 | Real H160 ↔ SS58 strategy | ✅ `revive`: H160 → SS58 (`H160 ++ 0xEE×12`) with the guide's test vector · ⏳ native SS58 → H160 |
-| Contracts deployed on Portaldot V3 testnet + tx evidence | ⏳ [`docs/evidence.md`](docs/evidence.md) |
+| Contracts deployed on Portaldot V3 testnet + tx evidence | ✅ MockRWA + RWAVault + full vault flow, [`docs/evidence.md`](docs/evidence.md) |
+| Dashboard + PortalVault hosted against V3 | ✅ https://portalkit.cristhedev.com · `/vault` |
 | `npx create-portalkit-app` | ⏳ packages ready; npm publish pending (works today via `--portalkit <path>`) |
 
-**Next on V3:** fund the deployer's mapped SS58 address (shown by the dashboard) → `forge script … --rpc-url portaldot_v3
---broadcast` (V3 runs plain solc bytecode; dry-runs of both contracts already succeed) → record evidence. If V3 ships an EVM ↔ native/WASM precompile, the dashboard grows a true **dual-VM view**
-(one account, both balances, calls across VMs).
+**Next on V3:** if V3 ships an EVM ↔ native/WASM precompile, the dashboard grows a true **dual-VM view**
+(one account, both balances, calls across VMs); native SS58 → H160 mapping once the runtime documents it.
 
 **After the hackathon:** publish the npm packages, contract verification + explorer links once Portaldot has an EVM explorer,
 ink!/WASM templates next to Solidity ones, and a hosted dashboard for the community.

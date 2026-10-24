@@ -1,0 +1,78 @@
+{
+  "name": "PortalKit",
+  "slug": "portalkit",
+  "theme": "robotic",
+  "device": "web",
+  "cta_button": "Try the dashboard",
+  "url_display": "portalkit.cristhedev.com",
+  "screens": [
+    "shots2/home.png",
+    "shots2/address.png",
+    "shots2/deploy.png",
+    "shots2/vault.png"
+  ],
+  "brand": {
+    "colors": [
+      "#ff2e93",
+      "#818cf8"
+    ],
+    "logo": "logo.svg"
+  },
+  "callouts": {
+    "stat": {
+      "label": "Contracts on V3",
+      "value": "3 live",
+      "delta": "testnet",
+      "trend": "up"
+    },
+    "toast": {
+      "icon": "badge-check",
+      "title": "Deployed on V3",
+      "body": "RWAVault live on Portaldot testnet."
+    }
+  },
+  "video": {
+    "hook": "Solidity on *Portaldot*",
+    "promise": "Ship EVM dApps on Portaldot V3 in minutes.",
+    "app_caption": "One portal, *two worlds*",
+    "features": [
+      {
+        "icon": "waypoints",
+        "title": "EVM ↔ *Substrate*",
+        "sub": "Fund the native side of any 0x.",
+        "focus": "center",
+        "box": {
+          "x": 0.5019,
+          "y": 0.2984,
+          "w": 0.4885,
+          "h": 0.3174
+        }
+      },
+      {
+        "icon": "rocket",
+        "title": "Deploy from *artifact*",
+        "sub": "Drop a JSON, see the cost first.",
+        "focus": "top",
+        "box": {
+          "x": 0.575,
+          "y": 0.0931,
+          "w": 0.4154,
+          "h": 0.1838
+        }
+      },
+      {
+        "icon": "vault",
+        "title": "RWA vault *showcase*",
+        "sub": "Tokenized gold, built with the kit.",
+        "focus": "top",
+        "box": {
+          "x": 0.2548,
+          "y": 0.2435,
+          "w": 0.4904,
+          "h": 0.1348
+        }
+      }
+    ],
+    "cta": "Build on V3 *today*"
+  }
+}
