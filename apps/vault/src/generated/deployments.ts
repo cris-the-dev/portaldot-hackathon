@@ -11,5 +11,10 @@ export const deployments: Record<number, Deployment> = {
     "MockRWA": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
     "RWAVault": "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512",
     "deployBlock": 0
+  },
+  "420420777": {
+    "MockRWA": "0x1ac55f7161efa932aa6963e86fac92b74d45094d",
+    "RWAVault": "0xe5378c971cf26453926b941dabf247cf1fd44697",
+    "deployBlock": 161010
   }
 };
