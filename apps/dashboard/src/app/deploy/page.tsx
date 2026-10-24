@@ -209,6 +209,9 @@ function CostEstimate({ gas, gasPrice, balance, symbol, decimals }: { gas: bigin
           {gas.toLocaleString()} gas × {gasPrice.toLocaleString()} wei · balance {fmt(balance)}
         </span>
       </dd>
+      <dd className="text-xs text-muted">
+        Most of this is the storage deposit for uploading new code — re-deploying bytecode already on chain costs far less.
+      </dd>
       {cost > balance && (
         <dd>
           <Notice tone="err">
