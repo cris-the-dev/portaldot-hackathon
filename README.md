@@ -5,7 +5,7 @@ Plus **PortalVault**, a compliance-aware tokenized-RWA vault built entirely with
 
 > Portaldot Hacker House 2026 · Track: **Modular Cloud and Middleware**.
 > **Live dashboard: https://portalkit.cristhedev.com** · **Live PortalVault (V3 testnet): https://portalkit.cristhedev.com/vault**
-> **Demo video (2:44):** [`demo-video/portalkit-demo.mp4`](demo-video/portalkit-demo.mp4). Every transaction in it is real, on the Portaldot V3 testnet.
+> **Demo video (2:44):** https://youtu.be/89P2RE-D5c8 ([mp4](demo-video/portalkit-demo.mp4)) · **Pitch deck:** [`docs/pitch-deck.pdf`](docs/pitch-deck.pdf). Every transaction in the video is real, on the Portaldot V3 testnet.
 > **Configured for the live Portaldot V3 testnet** (pallet-revive EVM, chainId 420420777, both its EVM RPC and its
 > Substrate node pass `portalkit doctor`), and everything is also tested **Anvil-first**. All values live in
 > [`config/networks.json`](config/networks.json). The native side also runs against live Portaldot mainnet.
